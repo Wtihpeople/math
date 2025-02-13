@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 업로드 슬라이드</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>이미지 업로드 & 슬라이드</h2>
+    <input type="file" id="fileInput" multiple accept="image/*">
+    <div>
+        <img id="slider" src="" alt="업로드한 이미지가 여기에 표시됩니다" style="display: none;">
+    </div>
+    <button onclick="prev()">이전</button>
+    <button onclick="next()">다음</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
