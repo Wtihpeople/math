@@ -5,16 +5,20 @@ let images = [
 ]; // GitHub에 업로드한 이미지 URL
 
 let index = 0;
+let slider = document.getElementById("slider");
 
-// 📌 페이지가 열리면 첫 번째 이미지 자동 표시
+// 📌 페이지가 열리면 첫 번째 이미지 표시 & 자동 슬라이드 시작
 window.onload = function() {
     showImage(0);
+    setInterval(next, 3000); // 3초마다 자동 변경
 };
 
 function showImage(idx) {
-    let slider = document.getElementById("slider");
-    slider.src = images[idx];
-    slider.style.display = "block";
+    slider.style.opacity = "0"; // 페이드 아웃 효과
+    setTimeout(() => {
+        slider.src = images[idx];
+        slider.style.opacity = "1"; // 페이드 인 효과
+    }, 500);
 }
 
 // 📌 다음 이미지로 이동
