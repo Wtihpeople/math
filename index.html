@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이미지 슬라이드</title>
+    <title>이미지 슬라이드 쇼</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>이미지 슬라이드</h2>
-    <div>
-        <img id="slider" src="" alt="이미지가 여기에 표시됩니다" style="display: none;">
+    <div class="slideshow-container">
+        <img id="slider" src="" alt="슬라이드 이미지">
+        <button class="prev" onclick="prev()">&#10094;</button>
+        <button class="next" onclick="next()">&#10095;</button>
     </div>
-    <button onclick="prev()">이전</button>
-    <button onclick="next()">다음</button>
-
     <script src="script.js"></script>
 </body>
 </html>
