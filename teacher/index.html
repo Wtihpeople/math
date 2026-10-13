@@ -315,6 +315,7 @@ function normalize(t){
   t=t.replace(/([영공일이삼사오육륙칠팔구십백천]{1,6})(?=\s?(단원|페이지|쪽|번|회|강|차|p\b))/g,(m,w)=>{const n=koNum(w);return n===null?m:String(n)});
   t=t.replace(/(페이지|쪽)\s*([영공일이삼사오육륙칠팔구십백천]{1,6})(?![가-힣])/g,(m,a,w)=>{const n=koNum(w);return n===null?m:a+" "+n});
   t=t.replace(/(\d+)\s*(페이지|쪽)\s*(에서|부터)\s*(\d+)\s*(페이지|쪽)?\s*(까지)?/g,"p.$1~$4");
+  t=t.replace(/(\d+)\s*(페이지|쪽)?\s*,?\s*(\d+)\s*(페이지|쪽)\s*까지/g,(m,a,x,b,y)=>x||true?"p."+a+"~"+b:m);
   t=t.replace(/(페이지|쪽)\s*(\d+)/g,"p.$2").replace(/(\d+)\s*(페이지|쪽)/g,"p.$1");
   t=t.replace(/p\.(\d+)\s*(에서|부터)\s*(?:p\.)?(\d+)\s*(까지)?/g,"p.$1~$3");
   t=t.replace(/(\d+)\s*(에서|부터)\s*(\d+)\s*(까지)/g,"$1~$3");
