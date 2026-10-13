@@ -160,7 +160,13 @@ h3{font-size:14px;margin:14px 0 6px;color:var(--sub);font-weight:500;letter-spac
         </div>
         <p style="font-size:12.5px;color:var(--sub);margin:8px 0 4px">모두 출석으로 시작합니다. <b>결석·지각인 학생만</b> 눌러 주세요.</p>
         <div id="attList"></div>
-        <h3>진도 · 과제 (주간 문자에 그대로 들어갑니다 · 마이크 버튼으로 말해도 됩니다)</h3>
+        <h3>진도 · 과제 (주간 문자에 그대로 들어갑니다)</h3>
+        <details class="detail" style="margin:4px 0 6px;padding:8px 12px"><summary style="cursor:pointer;font-size:13px">🎤 말로 넣는 법 (키보드 마이크 버튼)</summary>
+          <div style="font-size:13px;line-height:1.6;margin-top:6px">
+          "<b>7단원 24페이지에서 31페이지까지</b>" → 7단원 p.24~31<br>
+          "<b>유형편 55쪽까지 풀고 오답 정리</b>" → 유형편 p.55까지 풀고 오답 정리<br>
+          "<b>3단원 끝, 4단원 2번째 소단원까지</b>" → 3단원 끝, 4단원 2번째 소단원까지<br>
+          <span style="color:var(--sub)">칸에서 나오면 숫자·페이지 표기를 자동으로 정리합니다. 틀리면 그냥 고쳐 쓰면 됩니다.</span></div></details>
         <label for="unit" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">주교재 진도 <span id="bookMain" style="color:var(--ink)"></span></label>
         <input id="unit" placeholder="예) 7단원 p.84~91" enterkeyhint="next">
         <label for="hw" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">주교재 과제</label>
@@ -301,7 +307,20 @@ function renderAtt(){
   $("#weeklyPreview").hidden=true;
 }
 $("#attClass").onchange=renderAtt;
-["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).oninput=()=>notes[id+"|"+$("#attClass").value]=$("#"+id).value);
+const KN={영:0,공:0,일:1,이:2,삼:3,사:4,오:5,육:6,륙:6,칠:7,팔:8,구:9,십:10,백:100,천:1000};
+function koNum(w){ // 한글 수사 → 숫자 ("이십사"→24, "백이십"→120)
+  let total=0,cur=0;for(const ch of w){const v=KN[ch];if(v===undefined)return null;if(v>=10){cur=(cur||1)*v;total+=cur;cur=0}else cur=v}return total+cur}
+function normalize(t){
+  t=String(t||"").replace(/\s+/g," ").trim(); if(!t)return t;
+  t=t.replace(/([영공일이삼사오육륙칠팔구십백천]{1,6})(?=\s?(단원|페이지|쪽|번|회|강|차|p\b))/g,(m,w)=>{const n=koNum(w);return n===null?m:String(n)});
+  t=t.replace(/(페이지|쪽)\s*([영공일이삼사오육륙칠팔구십백천]{1,6})(?![가-힣])/g,(m,a,w)=>{const n=koNum(w);return n===null?m:a+" "+n});
+  t=t.replace(/(\d+)\s*(페이지|쪽)\s*(에서|부터)\s*(\d+)\s*(페이지|쪽)?\s*(까지)?/g,"p.$1~$4");
+  t=t.replace(/(페이지|쪽)\s*(\d+)/g,"p.$2").replace(/(\d+)\s*(페이지|쪽)/g,"p.$1");
+  t=t.replace(/p\.(\d+)\s*(에서|부터)\s*(?:p\.)?(\d+)\s*(까지)?/g,"p.$1~$3");
+  t=t.replace(/(\d+)\s*(에서|부터)\s*(\d+)\s*(까지)/g,"$1~$3");
+  t=t.replace(/(\d+)\s+단원/g,"$1단원").replace(/(\d+)\s+번/g,"$1번").replace(/\s*~\s*/g,"~").replace(/\s+,/g,",").replace(/ +/g," ").trim();
+  return t}
+["unit","hw","subUnit","subHw"].forEach(id=>{const el=$("#"+id);el.oninput=()=>notes[id+"|"+$("#attClass").value]=el.value;el.onchange=()=>{const v=normalize(el.value);if(v!==el.value){el.value=v;notes[id+"|"+$("#attClass").value]=v;toast("표기를 정리했습니다: "+v.slice(0,40))}}});
 $("#attSave").onclick=async()=>{
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
   const items=c.students.map(s=>({name:s.name,status:att[c.cls+"|"+s.name]||"출석",note:notes[c.cls+"|"+s.name]||""}));
