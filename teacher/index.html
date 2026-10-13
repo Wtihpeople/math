@@ -103,7 +103,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .detail{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px}.kv b{font-weight:500;color:var(--sub)}
 /* 내신 탭 */
-.chips{display:flex;gap:6px;flex-wrap:wrap}.chips button{border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;background:var(--panel)}.chips button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none}.chips button{border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;background:var(--panel)}.chips button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .nae{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}.nae:first-child{border-top:0}
 .nae .who b{font-size:16px}.nae .who span{color:var(--sub);font-size:13.5px;margin-left:6px}
 .nae .st{justify-self:end}
@@ -420,10 +420,10 @@ function renderNae(){setTopH();
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
   const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험"];
   const chip=(v,t,cur)=>`<button data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(t)}</button>`;
-  $("#naeSchool").innerHTML=`<button data-mine="1" aria-pressed="${naeF.mine}">내 담당만 ${list.filter(x=>x.teacher===boot.me.name).length}</button>`+chip("","전체 "+list.length,naeF.school)+schools.map(x=>chip(x,x+" "+list.filter(y=>y.school===x).length,naeF.school)).join("");
-  $("#naeWeek").innerHTML=chip("","전체",naeF.week)+weeks.map(w=>chip(w,w,naeF.week)).join("");
-  $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.mine){naeF.mine=!naeF.mine}else naeF.school=b.dataset.v;renderNae()});
-  $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=b.dataset.v;renderNae()});
+  $("#naeSchool").innerHTML=`<button data-mine="0" aria-pressed="${!naeF.mine}">전체 ${list.length}</button><button data-mine="1" aria-pressed="${naeF.mine}">담당반 ${list.filter(x=>x.teacher===boot.me.name).length}</button>`; // 학교 칩은 뺌(킴쌤 10/14: 주차로 고르면 충분)
+  $("#naeWeek").innerHTML=weeks.map(w=>chip(w,w+" "+list.filter(x=>(!naeF.mine||x.teacher===boot.me.name)&&weekKey(x.status)===w).length,naeF.week)).join(""); // 다시 누르면 해제
+  $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.mine=b.dataset.mine==="1";renderNae()});
+  $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=naeF.week===b.dataset.v?"":b.dataset.v;renderNae()});
   // 정렬: 이름 / 심화 / 실력 / 교과서 — 같은 버튼을 다시 누르면 높은순 ↔ 낮은순. 학교는 묶은 채로 그 안에서 정렬
   const SK={adv:"심화",std:"실력",text:"교과서"};
   $("#naeSort").innerHTML=`<span style="font-size:13px;color:var(--sub);align-self:center;margin-right:2px">정렬</span>`+[["","이름"],["adv","심화"],["std","실력"],["text","교과서"]].map(([k,t])=>`<button data-k="${k}" aria-pressed="${naeF.sort===k}">${t}${naeF.sort===k&&k?(naeF.dir<0?" ↓":" ↑"):""}</button>`).join("");
