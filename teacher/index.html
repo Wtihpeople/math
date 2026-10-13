@@ -52,7 +52,9 @@ span.dchip{display:inline-block!important;padding:1px 8px;border-radius:6px;font
 .cal .d.nn{background:var(--bad-soft)}.cal .d.nn .n{color:var(--bad)}.cal .d.nn .ev.n{background:transparent;padding:0}.cal .d.m.nn{background:linear-gradient(135deg,var(--bad-soft) 50%,var(--warn-soft) 50%)}
 .cal .d.tod .n{background:var(--brand);color:#fff}
 .tag{display:inline-block;width:10px;height:10px;border-radius:3px;margin:6px 6px 0 0;flex:none}.tag.a{background:var(--lime-deep)}.tag.n{background:var(--bad)}.tag.m{background:#F0A040}
-.cal .lst{margin-top:8px}.cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;white-space:pre-line}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
+.cal .lst{margin-top:8px}.wkg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}.wkg .wd{font-size:12px;color:var(--sub)}.wkg .wd:first-child{color:var(--bad)}.wkg .d{border:1px solid var(--line);border-radius:8px;padding:5px 0;font-weight:700;font-size:14.5px;background:var(--panel)}.wkg .d.m{background:var(--warn-soft);color:var(--warn)}.wkg .d.nn{background:var(--bad-soft);color:var(--bad)}.wkg .d.m.nn{background:linear-gradient(135deg,var(--bad-soft) 50%,var(--warn-soft) 50%)}.wkg .d.a{box-shadow:inset 0 -3px 0 var(--lime-deep)}.wkg .d.tod{background:var(--brand);color:#fff;border-color:var(--brand)}
+.wkl{margin-top:8px}.wkl .d2{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:14px;white-space:pre-line;align-items:flex-start}.wkl .d2:first-child{border-top:0}.wkl .dd{min-width:84px;font-weight:700;white-space:nowrap}
+.cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;white-space:pre-line}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
 @media (max-width:640px){.cal .d{min-height:40px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px}.cal .d .ev{display:none}.cal .d .n{font-size:14px}.cal .d.a:not(.m):not(.nn){box-shadow:inset 0 -3px 0 var(--lime-deep)}}
 .sch-row{display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:15px}.sch-row:first-child{border-top:0}.sch-row b{min-width:84px}
 .panel{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:70px 16px}.panel[hidden]{display:none}.panel .in{background:var(--panel);border-radius:14px;padding:14px 16px;max-width:520px;width:100%;max-height:70vh;overflow:auto}.top .meta{margin-left:auto;font-size:12.5px;opacity:.9;text-align:right;line-height:1.3;min-width:0}
@@ -180,7 +182,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <div class="col left">
     <!-- ① 꼭 확인 -->
     <section class="screen on" id="s-check" data-tab="check">
-      <h2>업무</h2>
+      <div class="card" id="c-wk" style="margin-top:0"><h3 style="margin-top:0">이번 주 일정</h3><div id="wkcal"></div></div>
       <div class="card" id="c-notice"><h3 style="margin-top:0">공지사항</h3><ul class="chk" id="notices"></ul></div>
       <div class="card" id="c-today"><h3 style="margin-top:0">일일 업무 <small style="font-weight:500;color:var(--sub)">· 오늘 수업 끝나고</small></h3><div id="todoToday"></div></div>
       <div class="card" id="c-week"><h3 style="margin-top:0">주간 업무 <small style="font-weight:500;color:var(--sub)">· 월수반 수요일 · 화목반 목요일 · 진단 범위 수요일</small></h3><div id="todoWeek"></div><div class="legend"><span class="m ok">완료</span>입력됨 <span class="m no">미완료</span>기한 지남 <span class="m due">미완료</span>오늘까지 <span class="m wait">미완료</span>기한 전</div></div>
@@ -310,6 +312,14 @@ function events(){ // 학사일정 + 내 학생 학교 내신 → [{d:Date,txt,k
   Object.values(nd).forEach(x=>ev.push({d:x.d,txt:"내신",full:x.schools.join("·")+" 내신",kind:"n",first:x.first}));
   return ev.sort((p,q)=>p.d-q.d);}
 function mySchools(){const b=boot,set=new Set();b.classes.forEach(c=>c.students.forEach(s=>{const n=(b.students[s.name]||{}).naesin;if(n)set.add(n.school+"|"+n.grade)}));return b.schools.filter(s=>set.size?set.has(s.school+"|"+s.grade):true);}
+function renderWeek(ev,key,t){ // 업무 탭 맨 위: 이번 주(일~토) 한 줄 + 그 주 일정 목록, 오늘 기준으로 자동
+  const st=new Date(t);st.setDate(t.getDate()-t.getDay());const en=new Date(st);en.setDate(st.getDate()+6);
+  const by={};ev.forEach(e=>{(by[key(e.d)]=by[key(e.d)]||[]).push(e)});
+  let cells="";for(let i=0;i<7;i++){const d=new Date(st);d.setDate(st.getDate()+i);const es=by[key(d)]||[];cells+=`<div class="d${key(d)===key(t)?" tod":""}${es.some(e=>e.kind==="m")?" m":""}${es.some(e=>e.kind==="n")?" nn":""}${es.some(e=>e.kind==="a")?" a":""}">${d.getDate()}</div>`}
+  const W="일월화수목금토",items=[];ev.filter(e=>e.d>=st&&e.d<=en).forEach(e=>{if(e.kind==="n"){(e.first||[]).forEach(x=>items.push({d:e.d,txt:x,kind:"n"}))}else items.push({d:e.d,txt:e.full,kind:e.kind})});
+  const mg=[];items.sort((a,b)=>a.d-b.d).forEach(e=>{const l=mg.find(m=>m.txt===e.txt&&m.kind===e.kind&&(e.d-m.end)===86400000);if(l)l.end=e.d;else mg.push({...e,end:e.d})});
+  $("#wkcal").innerHTML=`<div class="wkg">${W.split("").map(w=>`<div class="wd">${w}</div>`).join("")}${cells}</div><div class="wkl">${mg.length?mg.map(e=>`<div class="d2"><span class="dd">${e.d.getMonth()+1}/${e.d.getDate()}(${W[e.d.getDay()]})${e.end-e.d?`~${e.end.getMonth()+1}/${e.end.getDate()}(${W[e.end.getDay()]})`:""}</span><span class="tag ${e.kind}"></span><span>${esc(e.txt)}</span></div>`).join(""):`<div class="empty">이번 주 일정 없음</div>`}</div>`;
+}
 function renderCal(){
   const b=boot,t=new Date(b.today+"T00:00:00");if(!calYM)calYM=[t.getFullYear(),t.getMonth()];
   const [Y,M]=calYM,first=new Date(Y,M,1),start=new Date(Y,M,1-first.getDay()),ev=events();
@@ -324,6 +334,7 @@ function renderCal(){
   $("#cal").innerHTML=`<div class="calL"><div class="nav"><button id="calPrev">◀</button><b>${Y}년 ${M+1}월</b><button id="calNext">▶</button></div>
   <div class="g">${"일월화수목금토".split("").map(w=>`<div class="wd">${w}</div>`).join("")}${cells}</div><div style="font-size:12.5px;color:var(--sub);margin-top:6px"><span class="tag m"></span>월말 진단 <span class="tag n"></span>내신(내 학생 학교) <span class="tag a"></span>학원 일정</div></div>
   <div class="calR"><div class="lst">${sel&&sel.length?`<h3 style="margin:10px 0 4px">${esc(calSel.replace(/^\d+-/,"").replace("-","/"))}</h3>${sel.map(e=>`<div class="d2"><span class="tag ${e.kind}"></span><span>${esc(e.full||e.txt)}</span></div>`).join("")}<div style="height:8px"></div>`:""}${monthEv.length?monthEv.map(e=>`<div class="d2"><span class="dd">${e.d.getMonth()+1}/${e.d.getDate()}(${"일월화수목금토"[e.d.getDay()]})${e.end&&e.end-e.d?`~${e.end.getMonth()+1}/${e.end.getDate()}(${"일월화수목금토"[e.end.getDay()]})`:""}</span><span class="tag ${e.kind}"></span><span>${esc(e.txt)}</span></div>`).join(""):`<div class="empty">이 달 일정이 없습니다 (시트 '학사일정' 탭)</div>`}</div></div>`;
+  renderWeek(ev,key,t);
   $("#calPrev").onclick=()=>{calYM=[M===0?Y-1:Y,(M+11)%12];calSel=null;renderCal()};$("#calNext").onclick=()=>{calYM=[M===11?Y+1:Y,(M+1)%12];calSel=null;renderCal()};
   document.querySelectorAll("#cal .d").forEach(d=>d.onclick=()=>{calSel=calSel===d.dataset.k?null:d.dataset.k;renderCal()});
 }
@@ -401,7 +412,7 @@ function render(){
   renderNae();renderCal();
 }
 // ---------- 내신 탭 (구 [내신] 성취도 기준) ----------
-let naeF={school:"",week:"",sort:"",dir:-1};
+let naeF={school:"",week:"",sort:"",dir:-1,mine:false};
 const weekKey=st=>/시험/.test(st)?"시험":/완료/.test(st)?"완료":(st.match(/(\d)주차/)||[])[1]?(st.match(/(\d)주차/)[1]+"주차"):(st||"기타");
 function setTopH(){const t=$("#top");if(t&&!t.hidden)document.documentElement.style.setProperty("--toph",t.offsetHeight+"px")}
 addEventListener("resize",setTopH);
@@ -409,16 +420,16 @@ function renderNae(){setTopH();
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
   const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험"];
   const chip=(v,t,cur)=>`<button data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(t)}</button>`;
-  $("#naeSchool").innerHTML=chip("","전체 "+list.length,naeF.school)+schools.map(x=>chip(x,x+" "+list.filter(y=>y.school===x).length,naeF.school)).join("");
+  $("#naeSchool").innerHTML=`<button data-mine="1" aria-pressed="${naeF.mine}">내 담당만 ${list.filter(x=>x.teacher===boot.me.name).length}</button>`+chip("","전체 "+list.length,naeF.school)+schools.map(x=>chip(x,x+" "+list.filter(y=>y.school===x).length,naeF.school)).join("");
   $("#naeWeek").innerHTML=chip("","전체",naeF.week)+weeks.map(w=>chip(w,w,naeF.week)).join("");
-  $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.school=b.dataset.v;renderNae()});
+  $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.mine){naeF.mine=!naeF.mine}else naeF.school=b.dataset.v;renderNae()});
   $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=b.dataset.v;renderNae()});
   // 정렬: 이름 / 심화 / 실력 / 교과서 — 같은 버튼을 다시 누르면 높은순 ↔ 낮은순. 학교는 묶은 채로 그 안에서 정렬
   const SK={adv:"심화",std:"실력",text:"교과서"};
   $("#naeSort").innerHTML=`<span style="font-size:13px;color:var(--sub);align-self:center;margin-right:2px">정렬</span>`+[["","이름"],["adv","심화"],["std","실력"],["text","교과서"]].map(([k,t])=>`<button data-k="${k}" aria-pressed="${naeF.sort===k}">${t}${naeF.sort===k&&k?(naeF.dir<0?" ↓":" ↑"):""}</button>`).join("");
   $("#naeSort").querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(naeF.sort===k&&k)naeF.dir=-naeF.dir;else{naeF.sort=k;naeF.dir=-1}renderNae()});
   const pv=x=>{const n=parseFloat(x[naeF.sort]);return isNaN(n)?null:n};
-  const rows=list.filter(x=>(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week))
+  const rows=list.filter(x=>(!naeF.mine||x.teacher===boot.me.name)&&(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week))
     .sort((p,q)=>{const sc=p.school.localeCompare(q.school,"ko");if(sc)return sc;if(!naeF.sort)return(p.grade+p.name).localeCompare(q.grade+q.name,"ko");
       const a=pv(p),b=pv(q);if(a===null&&b===null)return 0;if(a===null)return 1;if(b===null)return -1;return naeF.dir<0?b-a:a-b});
   const lv=p=>{const n=parseFloat(p);if(isNaN(n))return"p0";return n>=90?"g3":n>=80?"g2":n>=70?"g1":n>=60?"y2":n>=50?"y1":n>=40?"r1":n>=30?"r2":"r3"};
