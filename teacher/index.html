@@ -46,7 +46,8 @@ input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9p
 .top b{font-size:18px;white-space:nowrap}.top .logo{height:40px;width:auto;flex:none}.top .logo[hidden]{display:none}
 .badges{display:flex;gap:6px;margin-left:auto}.badges button{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;padding:5px 11px;font-size:13px;border-radius:999px;white-space:nowrap}.badges button b{font-size:16px;margin-left:3px}.badges button span{margin-left:6px;opacity:.9;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}@media (max-width:640px){.badges button span{display:none}}.badges button.hot{background:#B3261E;border-color:#B3261E}
 .chk{list-style:none;margin:0;padding:0}.chk li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:9px;margin-top:6px;font-size:15.5px;line-height:1.4}.chk li.today{background:var(--bad-soft)}.chk li.week{background:var(--warn-soft)}.chk li.notice{background:var(--soft);cursor:pointer}.chk li.notice .tx{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.chk li.notice.open .tx{display:block}.chk li .dt{color:var(--sub);font-size:13px;white-space:nowrap}.chk li a{color:inherit;text-decoration:none;flex:1}.chk li a:hover{text-decoration:underline}.chk li .lk{font-size:12px;color:var(--info);white-space:nowrap}.chk li .tg{flex:none;font-size:12px;border-radius:999px;padding:2px 9px;font-weight:700;white-space:nowrap;margin-left:auto}.chk li .tg.done{background:var(--ok-soft);color:var(--ok)}.chk li .tg.todo{background:var(--bad-soft);color:var(--bad)}.chk li.isdone{opacity:.6}.chk li.isdone a,.chk li.isdone span:first-child{text-decoration:line-through}.chk li .bx{flex:none}
-.cls{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.cls .t{flex:1;min-width:0}.cls .t b{font-size:16px}.cls .t span{display:block;color:var(--sub);font-size:14px}.cls .wk{margin-top:4px;font-size:13.5px;line-height:1.45}.cls .wk b{font-size:13px;color:var(--sub);font-weight:500;margin-right:4px}
+.cls{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.cls .t{flex:1;min-width:0}.cls .t b{font-size:16px}.cls .t span{display:block;color:var(--sub);font-size:14px}.cls{cursor:pointer;border:2px solid transparent;flex-wrap:wrap}.cls.sel{border-color:var(--brand);background:var(--lime-soft)}.cls .wk{display:grid;grid-template-columns:auto 1fr 1fr;gap:2px 10px;margin-top:8px;font-size:13.5px;width:100%;align-items:baseline}.cls .wk b{font-size:12.5px;color:var(--sub);font-weight:500}.cls .wk .h{font-size:12px;color:var(--sub)}.cls .wk .v{min-width:0;word-break:keep-all}.cls .wk .no{color:var(--bad)}.cls .wk .ok{color:var(--ink)}
+.attp{margin:-4px 0 12px;border-top-left-radius:0;border-top-right-radius:0;border:2px solid var(--brand);border-top:0}.attp .bk{margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:6px 8px;align-items:center}.attp .bk[hidden]{display:none}.attp .bk b{grid-column:1/-1;font-size:14px}.attp .bk label{font-size:13.5px;color:var(--sub)}
 .cal{margin-top:8px}.cal .nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.cal .nav b{font-size:17px;min-width:110px;text-align:center}.cal .nav button{padding:3px 10px}
 .cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cal .wd{text-align:center;font-size:12px;color:var(--sub);padding:2px 0}.cal .wd:first-child{color:var(--bad)}.cal .wd:nth-child(7){color:var(--info)}
 .cal .d{min-height:52px;border:1px solid var(--line);border-radius:6px;padding:2px 3px;font-size:12px;background:var(--panel);overflow:hidden}.cal .d.out{opacity:.35}.cal .d .n{font-size:12px;font-weight:600}.cal .d.tod .n{background:var(--brand);color:#fff;border-radius:999px;padding:0 6px}.cal .d .ev{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:1.3;border-radius:3px;padding:0 3px;margin-top:1px}.cal .d .ev.a{background:var(--lime-soft)}.cal .d .ev.n{background:var(--bad-soft);color:var(--bad);font-weight:700}.cal .d .ev.m{background:transparent;color:var(--warn);font-weight:700;padding:0}.cal .d.m{background:var(--warn-soft)}.cal .d.m .n{color:var(--warn)}
@@ -71,7 +72,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .list{list-style:none;margin:0;padding:0}.list li{border-top:1px solid var(--line);padding:9px 0;display:flex;gap:10px;align-items:flex-start}.list li:first-child{border-top:0}
 .list li .t{flex:1;min-width:0}.list li small{display:block;color:var(--sub);font-size:12.5px}
 .empty{color:var(--sub);font-size:14px;padding:10px 0;text-align:center}
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(3,1fr);background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{border:0;border-radius:0;background:transparent;padding:9px 2px 7px;font-size:12px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px}
 .tabs button[aria-selected="true"]{color:var(--brand);font-weight:700}
 .tabs button .n{font-size:18px;line-height:1;font-weight:700}
@@ -117,6 +118,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   .col.left{position:sticky;top:66px;max-height:calc(100vh - 80px);overflow:auto;padding-right:2px}
   .col.bottom{grid-column:2}
   .col.right h2{font-size:24px}
+  .col.right section+section{margin-top:18px}
   .col.right .cls{padding:14px 16px}.col.right .cls .t b{font-size:19px}.col.right .cls .t span{font-size:15px}.col.right .cls .wk{font-size:14.5px}.col.right .cls button{font-size:16px;padding:11px 18px}
   .col.right .att{padding:10px 0}.col.right .att .nm{font-size:17px}.col.right .seg button{padding:9px 16px;font-size:15px}
   .cal{display:grid;grid-template-columns:1.15fr 1fr;gap:0 20px;align-items:start}.cal .calL{min-width:0}.cal .calR{min-width:0}.cal .d{min-height:62px}
@@ -159,7 +161,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <div class="col left">
     <!-- ① 꼭 확인 -->
     <section class="screen on" id="s-check" data-tab="check">
-      <h2>꼭 확인</h2>
+      <h2>업무</h2>
       <div class="card" id="c-notice"><h3 style="margin-top:0">공지사항</h3><ul class="chk" id="notices"></ul></div>
       <div class="card" id="c-today"><h3 style="margin-top:0">일일 업무</h3><ul class="chk" id="todoToday"></ul></div>
       <div class="card" id="c-week"><h3 style="margin-top:0">주간 업무</h3><ul class="chk" id="todoWeek"></ul></div>
@@ -167,37 +169,39 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     </section>
   </div>
   <div class="col right">
-    <!-- ② 오늘 수업 + 출석 -->
+    <!-- ② 오늘 수업 -->
     <section class="screen" id="s-today" data-tab="today">
       <h2 id="todayTitle">오늘 수업</h2>
-      <div class="card"><div id="todayClasses"></div><div id="todayMakeups"></div></div>
-      <div class="card" id="attCard">
-        <h3 style="margin-top:0">출석 · 진도</h3>
-        <div class="row">
-          <select id="attClass" aria-label="반 선택" style="flex:1;min-width:0"></select>
-          <input id="attDate" type="date" style="width:auto">
-        </div>
-        <div id="attList" style="margin-top:6px"></div>
-        <div id="lastWk" class="detail" style="margin-top:10px;font-size:14px" hidden></div>
-        <label for="unit" style="font-size:14px;color:var(--sub);display:block;margin-top:10px">진도 <span id="bookMain" style="color:var(--ink)"></span></label>
-        <input id="unit" placeholder="예) 7단원 p.84~91" enterkeyhint="next">
-        <label for="hw" style="font-size:14px;color:var(--sub);display:block;margin-top:6px">과제</label>
-        <input id="hw" placeholder="예) p.92~95 풀고 오답 정리" enterkeyhint="done">
-        <details style="margin-top:6px"><summary style="font-size:14px;color:var(--sub);cursor:pointer">부교재 <span id="bookSub"></span></summary>
-          <label for="subUnit" style="font-size:14px;color:var(--sub);display:block;margin-top:6px">부교재 진도</label><input id="subUnit">
-          <label for="subHw" style="font-size:14px;color:var(--sub);display:block;margin-top:6px">부교재 과제</label><input id="subHw">
-        </details>
-        <div class="row" style="margin-top:10px;justify-content:space-between">
-          <span id="attSum" style="font-size:14px;color:var(--sub)"></span>
-          <button class="lime" id="attSave">저장</button>
-        </div>
-        <div id="weeklyPreview" class="detail" hidden></div>
-      </div>
+      <div id="todayClasses"></div><div id="todayMakeups"></div>
+    </section>
+    <!-- ③ 담당 전체 수업 -->
+    <section class="screen" id="s-cls" data-tab="cls">
+      <h2>수업</h2>
+      <div id="allClasses"></div>
       <div class="card" id="stuCard"><h3 style="margin-top:0">내 학생 <select id="stuClass" aria-label="반 선택" style="width:auto;display:inline-block;margin-left:6px;font-size:14px;padding:5px 8px"></select></h3>
         <div id="stuList" style="margin-top:6px"></div>
       </div>
       <div class="card"><h3 style="margin-top:0">내 학생 학교 내신</h3><div id="schools"></div></div>
     </section>
+    <!-- 출석·진도 입력 패널: 선택한 반 카드 바로 아래로 옮겨 붙음 -->
+    <div class="card attp" id="attCard" hidden>
+      <select id="attClass" aria-label="반 선택" hidden></select>
+      <div class="row" style="justify-content:space-between"><h3 style="margin:0">출석 · 진도 <span id="attTitle" style="color:var(--sub);font-weight:500"></span></h3><input id="attDate" type="date" style="width:auto;padding:5px 8px;font-size:14px"></div>
+      <div id="attList" style="margin-top:6px"></div>
+      <div class="bk"><b id="bookMain"></b>
+        <label for="unit">진도</label><input id="unit" placeholder="예) 7단원 p.84~91" enterkeyhint="next">
+        <label for="hw">과제</label><input id="hw" placeholder="예) p.92~95 풀고 오답 정리" enterkeyhint="done">
+      </div>
+      <div class="bk" id="subBk"><b id="bookSub"></b>
+        <label for="subUnit">진도</label><input id="subUnit" placeholder="부교재 진도">
+        <label for="subHw">과제</label><input id="subHw" placeholder="부교재 과제">
+      </div>
+      <div class="row" style="margin-top:10px;justify-content:space-between">
+        <span id="attSum" style="font-size:14px;color:var(--sub)"></span>
+        <button class="lime" id="attSave">저장</button>
+      </div>
+      <div id="weeklyPreview" class="detail" hidden></div>
+    </div>
   </div>
   <div class="col bottom">
     <!-- ③ 일정 달력 -->
@@ -211,8 +215,9 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 </div>
 
 <nav class="tabs" id="tabs" hidden aria-label="화면">
-  <button data-go="check" aria-selected="true"><span class="n">확인<span class="badge" id="todoN" hidden></span></span></button>
+  <button data-go="check" aria-selected="true"><span class="n">업무<span class="badge" id="todoN" hidden></span></span></button>
   <button data-go="today"><span class="n">오늘</span></button>
+  <button data-go="cls"><span class="n">수업</span></button>
   <button data-go="sch"><span class="n">일정</span></button>
 </nav>
 <div class="toast" id="toast" role="status"></div>
@@ -227,8 +232,8 @@ function demoData(){
   const today=new Date(); const wd="일월화수목금토"[today.getDay()];
   const ymd=today.toISOString().slice(0,10);
   const cls=[
-    {cls:"개념1-2c",book:"개념유형 1-2",sub:"rpm 1-2",day:"월수6",teacher:"나",weekRange:"",naesinProgress:"일품1-2 5단원",weekly:{lastUnit:"4단원 p.60~71",lastHw:"p.72~75 오답",unit:"",hw:""},students:[{name:"가온",raw:"1가온",tags:[]},{name:"나래",raw:"1나래!",tags:["신규"]},{name:"다솜",raw:"1다솜",tags:[]},{name:"라온",raw:"1라온/",tags:["전반"]},{name:"마루",raw:"1마루",tags:[]}]},
-    {cls:"실력6-1b",book:"실력 6-1",day:"화목3",teacher:"나",weekRange:"3단계 초6-1 3~4단원",naesinProgress:"",weekly:{lastUnit:"3단원 끝",lastHw:"4단원 p.80까지",unit:"화 4단원 p.81~88",hw:"화 p.89~92",day:"목",sent:""},students:[{name:"바다",raw:"6바다",tags:[]},{name:"사랑",raw:"6사랑.",tags:["우수"]},{name:"아람",raw:"6아람;",tags:["미흡"]}]},
+    {cls:"개념1-2c",book:"개념유형 1-2",sub:"rpm 1-2",day:"월수6",teacher:"나",weekRange:"",naesinProgress:"일품1-2 5단원",weekly:{mainBook:"개념유형 1-2",subBook:"rpm 1-2",lastUnit:"4단원 p.60~71",lastHw:"p.72~75 오답",unit:"",hw:"",row:3},students:[{name:"가온",raw:"1가온",tags:[]},{name:"나래",raw:"1나래!",tags:["신규"]},{name:"다솜",raw:"1다솜",tags:[]},{name:"라온",raw:"1라온/",tags:["전반"]},{name:"마루",raw:"1마루",tags:[]}]},
+    {cls:"실력6-1b",book:"실력 6-1",day:"화목3",teacher:"나",weekRange:"3단계 초6-1 3~4단원",naesinProgress:"",weekly:{mainBook:"실력 6-1",subBook:"",lastUnit:"3단원 끝",lastHw:"4단원 p.80까지",unit:"4단원 p.81~88",hw:"p.89~92",day:"목",sent:"",row:9},students:[{name:"바다",raw:"6바다",tags:[]},{name:"사랑",raw:"6사랑.",tags:["우수"]},{name:"아람",raw:"6아람;",tags:["미흡"]}]},
     {cls:"공수1b",book:"쎈b 공수1",day:"화목6",teacher:"나",weekRange:"",naesinProgress:"",students:[{name:"자람",raw:"자람",tags:[]},{name:"차돌",raw:"차돌",tags:[]}]}];
   const st={
     가온:{naesin:{school:"여명중",grade:"1",exam:"2학기 중간",dday:"D-14",status:"2주차",start:"10/12(월)",back:"10/28(수)",end:"11/9(월)",progress:"일품1-2 5단원"},ach:{rec:"심화",adv:"52%",advC:{green:41,yellow:12,red:5,gray:2,skull:3,none:16},std:"96%",stdC:{green:117,yellow:3,red:1,gray:0,skull:1,none:0},text:"95%",textC:{green:94,yellow:4,red:0,gray:0,skull:1,none:0}},absences:[{date:"9/30(수)",type:"정규수업",makeupDate:"10/3(토)",hour:"14",done:"완료"}],pendingMakeup:0,upcomingAbsence:[]},
@@ -291,17 +296,23 @@ function renderCal(){
   $("#calPrev").onclick=()=>{calYM=[M===0?Y-1:Y,(M+11)%12];calSel=null;renderCal()};$("#calNext").onclick=()=>{calYM=[M===11?Y+1:Y,(M+1)%12];calSel=null;renderCal()};
   document.querySelectorAll("#cal .d").forEach(d=>d.onclick=()=>{calSel=calSel===d.dataset.k?null:d.dataset.k;renderCal()});
 }
-let lists={abs:[],mk:[],todo:[]};
+let lists={abs:[],mk:[],todo:[]}; let selCls=null, lastHost="todayClasses";
+function selectClass(cls,el){const same=selCls===cls&&el.classList.contains("sel");document.querySelectorAll(".cls.sel").forEach(x=>x.classList.remove("sel"));const p=$("#attCard");if(same){selCls=null;p.hidden=true;return}selCls=cls;lastHost=el.closest("section").querySelector("#todayClasses")&&el.closest("#todayClasses")?"todayClasses":"allClasses";el.classList.add("sel");$("#attClass").value=cls;$("#stuClass").value=cls;openStu=null;renderStu();el.after(p);p.hidden=false;renderAtt();}
 function render(){
   const b=boot; $("#who").textContent=b.me.name+(b.me.role!=="선생님"?" · "+b.me.role:"");
   $("#when").textContent=b.today.slice(5).replace("-","/")+"("+b.weekday+")";
   $("#todayTitle").textContent="오늘 수업 · "+b.today.slice(5).replace("-","/")+"("+b.weekday+")";
   const tc=b.classes.filter(c=>b.todayClasses.includes(c.cls));
   const done=c=>Object.keys(b.attendance).some(k=>k.startsWith(c.cls+"|"));
-  const wk=c=>{const w=c.weekly;if(!w)return"";const L=(w.lastUnit||w.lastHw)?`<div><b>지난주</b>${esc(w.lastUnit||"—")}${w.lastHw?" · 과제 "+esc(w.lastHw):""}</div>`:"";const T=(w.unit||w.hw)?`<div><b>이번 주</b>${esc(w.unit||"—")}${w.hw?" · 과제 "+esc(w.hw):""}</div>`:`<div><b>이번 주</b><span style="color:var(--bad);display:inline">아직 없음</span></div>`;return`<div class="wk">${L}${T}</div>`};
-  $("#todayClasses").innerHTML=tc.length?tc.map(c=>`<div class="cls"><div class="t"><b>${esc(c.cls)}</b><span>${esc(c.book||"")}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">완료</span>`:`<button class="primary" data-att="${esc(c.cls)}">출석·진도</button>`}</div>`).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
-  document.querySelectorAll("[data-att]").forEach(x=>x.onclick=()=>{$("#attClass").value=x.dataset.att;$("#stuClass").value=x.dataset.att;renderAtt();renderStu();go("today");$("#attCard").scrollIntoView({behavior:"smooth",block:"start"})});
-  $("#todayMakeups").innerHTML=b.myMakeups.map(m=>`<div class="cls"><div class="t"><b>보강 ${esc(m.name)}</b><span>${m.hour?esc(m.hour)+"시 · ":""}${m.room?esc(m.room):"교실 미정"}${m.progress?" · "+esc(m.progress):""}</span></div></div>`).join("");
+  const cell=(v,miss)=>v?`<span class="v ok">${esc(v)}</span>`:`<span class="v no">${miss}</span>`;
+  const wk=c=>{const w=c.weekly;if(!w)return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>이번 주</b><span class="v no" style="grid-column:2/-1">주간 탭에 이 반 블록이 없음</span></div>`;
+    return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>지난주</b>${cell(w.lastUnit,"—")}${cell(w.lastHw,"—")}<b>이번 주</b>${cell(w.unit,"미입력")}${cell(w.hw,"미입력")}</div>`};
+  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><b>${esc(c.cls)}</b><span>${esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""} · ${esc(c.day)}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:`<button class="primary">출석·진도</button>`}</div>`;
+  $("#todayClasses").innerHTML=tc.length?tc.map(card).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
+  $("#allClasses").innerHTML=b.classes.length?b.classes.map(card).join(""):`<div class="empty">담당 반이 없습니다</div>`;
+  document.querySelectorAll(".cls[data-att]").forEach(x=>x.onclick=e=>{if(e.target.closest("a"))return;selectClass(x.dataset.att,x)});
+  if(selCls){const host=document.querySelector(`#${lastHost} .cls[data-att="${CSS.escape(selCls)}"]`)||document.querySelector(`.cls[data-att="${CSS.escape(selCls)}"]`);if(host){host.classList.add("sel");host.after($("#attCard"));$("#attCard").hidden=false;renderAtt()}}
+  $("#todayMakeups").innerHTML=b.myMakeups.map(m=>`<div class="cls" style="cursor:default"><div class="t"><b>보강 ${esc(m.name)}</b><span>${m.hour?esc(m.hour)+"시 · ":""}${m.room?esc(m.room):"교실 미정"}${m.progress?" · "+esc(m.progress):""}</span></div></div>`).join("");
   // 상단 숫자
   const abs=[],mk=b.myMakeups.map(m=>`${m.name} ${m.hour?m.hour+"시":""} ${m.room||"교실 미정"}`);
   Object.entries(b.attendance).forEach(([k,v])=>{if(v.status==="결석")abs.push(k.replace("|"," · ")+" 결석")});
@@ -309,13 +320,12 @@ function render(){
   const L=b.links||{};
   const todayT=[],weekT=[],monthT=[];
   tc.forEach(c=>todayT.push({t:c.cls+" 출석·진도 입력",cls:c.cls,app:true,ok:done(c)}));
-  tc.forEach(c=>{const w=c.weekly;if(!w)return;const di="월화수목금토".indexOf(w.day),ti="월화수목금토".indexOf(b.weekday);
-    if(w.unit)todayT.push({t:c.cls+" 이번 주 진도 입력",ok:true,link:(b.links||{}).주간});
-    if(w.sent)todayT.push({t:c.cls+" 주간 문자 확인",ok:true,link:(b.links||{}).주간});});
-  if(b.weekday==="수"||b.weekday==="목")tc.forEach(c=>{if(c.weekRange)weekT.push({t:c.cls+" 주간진단 범위 입력",ok:true,link:c.link})});
-  b.todo.forEach(t=>{const o={t:t.text,link:t.link};(t.kind==="월간"?monthT:(t.kind==="주간진단"||t.kind==="보강")?weekT:todayT).push(o)});
-  b.classes.forEach(c=>c.students.forEach(s=>{const n=(b.students[s.name]||{}).naesin;if(n&&/^D-(\d+)/.test(n.dday)&&+n.dday.match(/\d+/)[0]<=7&&/예정/.test(n.status))weekT.push({t:`${s.name} ${n.school} ${n.dday} — 내신 전환 확인`});
-    s.tags.forEach(t=>{if(t==="신규"||t==="전반")weekT.push({t:`${s.name} ${t==="신규"?"신규 — 교재 안내 문자":"전반 — 교재 문자"} (${c.cls})`,link:c.link})})}));
+  const LK=b.links||{}; const cellLink=(base,a1)=>base?base.replace(/&range=.*$/,"")+(a1?"&range="+a1:""):"";
+  b.classes.forEach(c=>{const w=c.weekly;
+    if(w){weekT.push({t:c.cls+" 주간 단원·과제 입력",ok:!!(w.unit||w.hw),link:cellLink(LK.주간,w.row?"E"+w.row:"")});
+          weekT.push({t:c.cls+" 주간 확인(문자)",ok:!!w.sent,link:cellLink(LK.주간,w.row?"M"+w.row:"")});}
+    weekT.push({t:c.cls+" 주간진단 범위",ok:!!c.weekRange,link:cellLink(LK.반별||c.link,c.row?"K"+c.row:"")});});
+  b.todo.forEach(t=>{if(t.kind==="월간")monthT.push({t:t.text,link:t.link})});
   const absL=abs.map(t=>({t,link:L.결석보강})),mkL=mk.map(t=>({t,link:L.결석보강}));
   const isDone=x=>!!x.ok; // 완료 = 시트 칸에 입력됨 (출석 탭 기록 · 주간 E 진도 · 주간 M 확인 · 반별 K 범위)
   const pend=a=>a.filter(x=>!isDone(x));lists={abs:absL,mk:mkL,todo:[...pend(todayT).map(x=>({...x,t:"오늘 · "+x.t})),...pend(weekT).map(x=>({...x,t:"이번 주 · "+x.t})),...pend(monthT).map(x=>({...x,t:"이번 달 · "+x.t}))]};
@@ -355,12 +365,12 @@ function renderAtt(){
   document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
   const vals=c.students.map(s=>att[c.cls+"|"+s.name]||"출석");
   $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length} · 지각 ${vals.filter(v=>v==="지각").length}`;
-  $("#bookMain").textContent=c.book?"("+c.book+")":"";$("#bookSub").textContent=c.sub?"("+c.sub+")":"";
-  const w=c.weekly;const lw=$("#lastWk");if(w&&(w.lastUnit||w.lastHw||w.lastSubHw)){lw.hidden=false;lw.innerHTML=`<b>지난주${w.lastWeek?" ("+esc(w.lastWeek)+")":""}</b><br>진도: ${esc(w.lastUnit||"—")}<br>과제: <b>${esc(w.lastHw||"—")}</b>${w.lastSubHw?`<br>부교재 과제: ${esc(w.lastSubHw)}`:""}<br><small style="color:var(--sub)">이번 수업에서 지난주 과제 검사</small>`}else lw.hidden=true;
+  const mb=(c.weekly&&c.weekly.mainBook)||c.book||"주교재", sb=(c.weekly&&c.weekly.subBook)||c.sub||"";
+  $("#attTitle").textContent=c.cls;$("#bookMain").textContent=mb;$("#bookSub").textContent=sb;$("#subBk").hidden=!sb;
   ["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).value=notes[id+"|"+c.cls]||"");
   $("#weeklyPreview").hidden=true;
 }
-$("#attClass").onchange=()=>{renderAtt();$("#stuClass").value=$("#attClass").value;openStu=null;renderStu()};
+
 const KN={영:0,공:0,일:1,이:2,삼:3,사:4,오:5,육:6,륙:6,칠:7,팔:8,구:9,십:10,백:100,천:1000};
 function koNum(w){ // 한글 수사 → 숫자 ("이십사"→24, "백이십"→120)
   let total=0,cur=0;for(const ch of w){const v=KN[ch];if(v===undefined)return null;if(v>=10){cur=(cur||1)*v;total+=cur;cur=0}else cur=v}return total+cur}
