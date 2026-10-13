@@ -102,7 +102,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .nae .st{justify-self:end}
 .nae .ach{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .nae .ach div{border-radius:10px;padding:6px 8px;font-size:13px;line-height:1.3;text-align:center;background:var(--soft)}.nae .ach div b{display:block;font-size:17px}
-.nae .ach .c-green{background:var(--g)}.nae .ach .c-yellow{background:var(--y)}.nae .ach .c-red{background:var(--r)}.nae .ach .c-gray{background:var(--gr)}.nae .ach .c-skull{background:var(--dk)}.nae .ach .c-none{background:var(--soft);color:var(--sub)}
+/* 성취도 % 단계색: 높을수록 진한 풀색 */.nae .ach .p5{background:#1f8f4f;color:#fff}.nae .ach .p4{background:#5cc07f;color:#0f3d22}.nae .ach .p3{background:#a9dfb9;color:#1e2a38}.nae .ach .p2{background:#dff3e5;color:#1e2a38}.nae .ach .p1{background:#f1f3f1;color:#8a9199}.nae .ach .p0{background:var(--soft);color:var(--sub)}
 .nae .ach .rec{outline:2px solid var(--ink);outline-offset:-2px}
 /* 업무 표 */
 .tb{width:100%;border-collapse:separate;border-spacing:0;font-size:14.5px}.tb th{font-weight:600;color:var(--sub);font-size:12.5px;text-align:center;padding:4px 2px;border-bottom:1px solid var(--line)}.tb th:first-child{text-align:left}
@@ -398,9 +398,9 @@ function renderNae(){
   $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.school=b.dataset.v;renderNae()});
   $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=b.dataset.v;renderNae()});
   const rows=list.filter(x=>(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week));
-  const top=c=>{if(!c)return"none";const e=Object.entries(c).map(([k,v])=>[k,+String(v).replace(/[^\d]/g,"")||0]);e.sort((p,q)=>q[1]-p[1]);return e[0][1]>0?e[0][0]:"none"};
-  const box=(lab,pct,c,rec)=>`<div class="c-${top(c)}${rec?" rec":""}"><b>${esc(pct||"–")}</b>${lab}${rec?" ★":""}</div>`;
-  $("#naeList").innerHTML=rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join("")+`<div class="legend" style="margin-top:10px">칸 색 = 6색 중 가장 많은 색 · ★ = 시트의 추천(특이) 교재 · 원천: 시트 [내신] 성취도</div>`:`<div class="empty">해당 학생 없음</div>`;
+  const lv=p=>{const n=parseFloat(p);if(isNaN(n))return"p0";return n>=90?"p5":n>=70?"p4":n>=50?"p3":n>=30?"p2":"p1"};
+  const box=(lab,pct,c,rec)=>`<div class="${lv(pct)}${rec?" rec":""}"><b>${esc(pct||"–")}</b>${lab}${rec?" ★":""}</div>`;
+  $("#naeList").innerHTML=rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join("")+`<div class="legend" style="margin-top:10px">칸 색 = 성취도 % (90↑ 진함 · 70 · 50 · 30 · 그 아래 연함) · ★ = 시트의 추천(특이) 교재 · 원천: 시트 [내신] 성취도</div>`:`<div class="empty">해당 학생 없음</div>`;
 }
 document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.dataset.p;$("#panelTitle").textContent={abs:"결석",mk:"오늘 보강",todo:"미완료"}[p];
   $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
