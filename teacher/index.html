@@ -206,7 +206,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
       <select id="attClass" aria-label="반 선택" hidden></select>
       <div class="row" style="justify-content:space-between"><h3 style="margin:0">출석 · 진도 <span id="attTitle" style="color:var(--sub);font-weight:500"></span></h3><input id="attDate" type="date" style="width:auto;padding:5px 8px;font-size:14px"></div>
       <div id="attList" style="margin-top:6px"></div>
-      <div class="bk"><b id="bookMain"></b>
+      <div class="bk" id="mainBk"><b id="bookMain"></b>
         <label for="unit">진도</label><input id="unit" placeholder="예) 7단원 p.84~91" enterkeyhint="next">
         <label for="hw">과제</label><input id="hw" placeholder="예) p.92~95 풀고 오답 정리" enterkeyhint="done">
       </div>
@@ -326,9 +326,9 @@ function render(){
   const tc=b.classes.filter(c=>b.todayClasses.includes(c.cls));
   const done=c=>Object.keys(b.attendance).some(k=>k.startsWith(c.cls+"|"));
   const cell=(v,miss)=>v?`<span class="v ok">${esc(v)}</span>`:`<span class="v no">${miss}</span>`;
-  const wk=c=>{const w=c.weekly;if(!w)return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>이번 주</b><span class="v no" style="grid-column:2/-1">주간 탭에 이 반 블록이 없음</span></div>`;
+  const wk=c=>{if(c.mk)return`<div class="wk"><span class="h"></span><span class="h" style="grid-column:2/-1">마스터클리닉 · ${esc(c.mk.time||"")} · ${c.students.length}명 (보강 ${c.students.filter(s=>s.makeup).length})</span></div>`;const w=c.weekly;if(!w)return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>이번 주</b><span class="v no" style="grid-column:2/-1">주간 탭에 이 반 블록이 없음</span></div>`;
     return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>지난주</b>${cell(w.lastUnit,"—")}${cell(w.lastHw,"—")}<b>이번 주</b>${cell(w.unit,"미입력")}${cell(w.hw,"미입력")}</div>`};
-  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><b>${esc(c.cls)}</b><span>${esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""} · ${esc(c.day)}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
+  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><b>${esc(c.cls)}</b><span>${c.mk?"":esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""}${c.mk?"":" · "}${esc(c.day)}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
   $("#todayClasses").innerHTML=tc.length?tc.map(card).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
   $("#allClasses").innerHTML=b.classes.length?b.classes.map(card).join(""):`<div class="empty">담당 반이 없습니다</div>`;
   document.querySelectorAll(".cls[data-att]").forEach(x=>x.onclick=e=>{if(e.target.closest("a"))return;selectClass(x.dataset.att,x)});
@@ -347,8 +347,8 @@ function render(){
   const todayT=[],weekT=[],monthT=[];
   const dueTxt=d=>WD[d]+"요일까지";
   tc.forEach(c=>{const w=c.weekly;const m1=mark(done(c),ti),m2=mark(!!(w&&(w.unit||w.hw)),ti);
-    todayT.push({cls:c.cls,sub:esc(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
-  b.classes.forEach(c=>{const w=c.weekly,d=dayOf(c);
+    todayT.push({cls:c.cls,sub:esc(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},c.mk?{m:{k:"na",t:"—"},t:c.cls+" 진도·과제",rows:[["마스터클리닉은 진도·과제 입력 없음","miss"]]}:{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
+  b.classes.forEach(c=>{if(c.mk)return;const w=c.weekly,d=dayOf(c);
     const c1=w?{m:mark(!!(w.unit||w.hw),d),t:c.cls+" 단원·과제",rows:wkDetail(c),app:true,go:"수업 탭에서 입력",link:cellLink(LK.주간,w.row?"E"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 단원·과제",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
     const c2=w?{m:mark(!!w.sent,d),t:c.cls+" 주간 문자 확인",rows:[["주간 문자 발송 확인(주간 탭 M)",w.sent]],note:"문자를 보낸 뒤 주간 탭 확인란에 표시하면 ✓로 바뀝니다",link:cellLink(LK.주간,w.row?"M"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 주간 문자 확인",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
     const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위(반별 탭 K)",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"수요일까지"};
@@ -406,22 +406,31 @@ document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.
   $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
 $("#panelClose").onclick=()=>$("#panel").hidden=true;$("#panel").onclick=e=>{if(e.target.id==="panel")$("#panel").hidden=true};
 const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?(+m[1])+"/"+(+m[2]):""};
+$("#attDate")&&($("#attDate").onchange=()=>renderAtt());
 const attMD=()=>{const v=$("#attDate").value;const m=v.match(/^\d{4}-(\d{2})-(\d{2})/);return m?(+m[1])+"/"+(+m[2]):""};
+// 학생 한 명의 현재 출결(화면 = 저장): 직접 누른 값 > 오늘 저장한 값 > 마클 칸 값(결/출) > 시트 결석 등록 > 출석
+function preOf(c,s){const st=boot.students[s.name]||{};const dsel=attMD();
+  const mk=c.mk&&s.att?String(s.att[dsel]||"").trim():"";
+  if(mk==="결")return{type:"마클에 결 표시",note:"",src:"mk"};
+  if(st.todayAbsence&&dsel===md(boot.today.slice(5).replace("-","/")))return st.todayAbsence;
+  return(st.upcomingAbsence||[]).some(d=>md(d)===dsel)?{type:"결석 예정",note:""}:null}
+function curOf(c,s){const k=c.cls+"|"+s.name;const saved=boot.attendance||{};const mk=c.mk&&s.att?String(s.att[attMD()]||"").trim():"";
+  return att[k]||(saved[k]||{}).status||(mk==="출"?"출석":preOf(c,s)?"결석":"출석")}
 function renderAtt(){
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
   const saved=boot.attendance;
-  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const st=boot.students[s.name]||{};const dsel=attMD();const pre=st.todayAbsence||((st.upcomingAbsence||[]).some(d=>md(d)===dsel)?{type:"결석 예정",note:""}:null);
-    const cur=att[k]||(saved[k]||{}).status||(pre?"결석":"출석");
+  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const st=boot.students[s.name]||{};const pre=preOf(c,s);
+    const cur=curOf(c,s);
     if(pre&&!(k in notes)&&!saved[k])notes[k]=pre.note||"";
-    return `<div class="att"><div class="nm">${esc(s.name)}${s.tags.length?`<small>${esc(s.tags.join("·"))}</small>`:""}${pre?`<small style="color:var(--bad)">시트에 결석 등록됨${pre.type?" · "+esc(pre.type):""}</small>`:(st.upcomingAbsence||[]).length?`<small style="color:var(--bad)">결석 예정 ${esc(st.upcomingAbsence[0])}</small>`:""}</div>
+    return `<div class="att"><div class="nm">${esc(s.name)}${s.tags.length?`<small>${esc(s.tags.join("·"))}</small>`:""}${pre?`<small style="color:var(--bad)">${pre.src==="mk"?"마클에 결 표시됨":"시트에 결석 등록됨"+(pre.type?" · "+esc(pre.type):"")}</small>`:(st.upcomingAbsence||[]).length?`<small style="color:var(--bad)">결석 예정 ${esc(st.upcomingAbsence[0])}</small>`:""}</div>
     <div class="seg" role="group" aria-label="${esc(s.name)} 출결"><button class="a" data-k="${esc(k)}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="x" data-k="${esc(k)}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button></div>
     ${cur==="결석"?`<input class="note-in" placeholder="결석 사유·메모 (특이사항에 들어감)" data-note="${esc(k)}" value="${esc(notes[k]||"")}">`:""}</div>`}).join("");
   document.querySelectorAll("#attList .seg button").forEach(bt=>bt.onclick=()=>{att[bt.dataset.k]=bt.dataset.v;renderAtt()});
   document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
-  const vals=c.students.map(s=>att[c.cls+"|"+s.name]||"출석");
+  const vals=c.students.map(s=>curOf(c,s));
   $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length}`;
   const mb=(c.weekly&&c.weekly.mainBook)||c.book||"주교재", sb=(c.weekly&&c.weekly.subBook)||c.sub||"";
-  $("#attTitle").textContent=c.cls;$("#bookMain").textContent="주교재 · "+mb;$("#bookSub").textContent="부교재 · "+sb;$("#subBk").hidden=!sb;
+  $("#attTitle").textContent=c.cls;$("#bookMain").textContent="주교재 · "+mb;$("#bookSub").textContent="부교재 · "+sb;$("#subBk").hidden=!sb||!!c.mk;$("#mainBk").hidden=!!c.mk;
   ["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).value=notes[id+"|"+c.cls]||"");
   $("#weeklyPreview").hidden=true;
 }
@@ -472,9 +481,9 @@ function normalize(t){
 ["unit","hw","subUnit","subHw"].forEach(id=>{const el=$("#"+id);el.oninput=()=>notes[id+"|"+$("#attClass").value]=el.value;el.onchange=()=>{const v=normalize(el.value);if(v!==el.value){el.value=v;notes[id+"|"+$("#attClass").value]=v;toast("표기를 정리했습니다: "+v.slice(0,40))}}});
 $("#attSave").onclick=async()=>{
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
-  const items=c.students.map(s=>({name:s.name,status:att[c.cls+"|"+s.name]||"출석",note:notes[c.cls+"|"+s.name]||""}));
-  const weekly={unit:$("#unit").value.trim(),hw:$("#hw").value.trim(),subUnit:$("#subUnit").value.trim(),subHw:$("#subHw").value.trim()};
-  const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:weekly.unit,items,weekly};
+  const items=c.students.map(s=>({name:s.name,status:curOf(c,s),note:notes[c.cls+"|"+s.name]||"",makeup:!!s.makeup,mkRow:s.mkRow||0}));
+  const weekly=c.mk?null:{unit:$("#unit").value.trim(),hw:$("#hw").value.trim(),subUnit:$("#subUnit").value.trim(),subHw:$("#subHw").value.trim()};
+  const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:weekly?weekly.unit:"",items,weekly,mk:c.mk||null};
   $("#attSave").disabled=true;
   try{
     let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
