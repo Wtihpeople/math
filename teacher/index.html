@@ -415,7 +415,7 @@ $("#attSave").onclick=async()=>{
     let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
     if(!r.ok)throw new Error(r.error||"fail");
     items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});
-    toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}${r.absencesMerged?` · 사유 ${r.absencesMerged}건 보충`:""}${r.weekly&&r.weekly.ok?" · 주간 탭 기록":""}`);render();
+    ls.del("boot");toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}${r.absencesMerged?` · 사유 ${r.absencesMerged}건 보충`:""}${r.weekly&&r.weekly.ok?" · 주간 탭 기록":""}`);render();
     if(r.weekly){const w=$("#weeklyPreview");w.hidden=false;w.innerHTML=r.weekly.ok?`<b>주간 문자 미리보기 (${esc(r.weekly.week||"")})</b><pre style="white-space:pre-wrap;font:inherit;margin:6px 0 0">${esc(r.weekly.message||"(아직 비어 있음)")}</pre>`:`<span style="color:var(--bad)">주간 탭에 못 썼습니다: ${esc(r.weekly.reason||"")}</span>`;}
   }catch(e){toast(e.message==="auth"?"다시 로그인해 주세요":"저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요")}
   finally{$("#attSave").disabled=false}
@@ -442,21 +442,24 @@ $("#stuClass").onchange=()=>{openStu=null;renderStu()};
 
 // ---------- 시작 ----------
 function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;$("#demoBar").hidden=!demo;render();go(ls.get("tab")||"check");}
-async function load(){
-  try{const r=await api({a:"bootstrap",t:ls.get("token")||""});if(!r.ok)throw new Error(r.error||"fail");boot=r;ls.set("boot",JSON.stringify(r));showApp();}
-  catch(e){const c=ls.get("boot");if(c&&e.message!=="auth"){boot=JSON.parse(c);showApp();toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
+async function load(fresh){
+  // 저장된 화면이 있으면 먼저 보여주고(즉시), 뒤에서 새 데이터를 받아 갱신한다
+  const c=ls.get("boot"); let shown=false;
+  if(c&&!boot){try{boot=JSON.parse(c);showApp();shown=true;toast("불러오는 중…")}catch(e){}}
+  try{const r=await api({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;ls.set("boot",JSON.stringify(r));showApp();if(shown)toast("최신으로 갱신했습니다"+(r.cached?" (2분 내 캐시)":""));}
+  catch(e){if(shown&&e.message!=="auth"){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
 }
 $("#go").onclick=async()=>{
   const base=$("#api").value.trim()||API_DEFAULT,name=$("#nm").value.trim(),pin=$("#pin").value.trim();
   if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
   ls.set("api",base);$("#go").disabled=true;
-  try{const r=await api({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":"연결 실패");ls.set("token",r.token);demo=false;await load();}
+  try{const r=await api({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":"연결 실패");ls.set("token",r.token);demo=false;$("#go").textContent="불러오는 중…";await load();$("#go").textContent="들어가기";}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"주소에 연결하지 못했습니다":e.message;$("#lerr").hidden=false}
   finally{$("#go").disabled=false}
 };
 $("#demo").onclick=()=>{demo=true;boot=demoData();showApp();};
 $("#logout").onclick=()=>{ls.del("token");ls.del("boot");demo=false;att={};notes={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
-$("#refresh").onclick=()=>{if(demo){boot=demoData();render();toast("예시 화면을 새로 그렸습니다")}else load()};
+$("#refresh").onclick=()=>{if(demo){boot=demoData();render();toast("예시 화면을 새로 그렸습니다")}else{toast("새로 받는 중…");load(true)}};
 const API_DEFAULT="https://script.google.com/macros/s/AKfycbxW5BKDfh3tuWTYDIaZILVPCZwRA4Vbsk0i09XN6-eEpJgauQjHp_hn5AP7x_xM2_Ra/exec";
 $("#api").value=ls.get("api")||API_DEFAULT;
 if(ls.get("token")&&ls.get("api"))load();
