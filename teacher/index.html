@@ -106,7 +106,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none}.chips button{border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;background:var(--panel)}.chips button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .nae{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}.nae:first-child{border-top:0}
 .nae .who b{font-size:16px}.nae .who span{color:var(--sub);font-size:13.5px;margin-left:6px}
-.nae .st{justify-self:end}
+.nae .st{justify-self:end;font-weight:700}.pill.s-pre{background:#ffff00;color:#000}.pill.s-1{background:#38761d;color:#fff}.pill.s-2{background:#b6d7a8;color:#000}.pill.s-3{background:#e06666;color:#fff}.pill.s-ex{background:#ff0000;color:#fff}.pill.s-c1{background:#c9daf8;color:#000}.pill.s-c2{background:#6d9eeb;color:#fff}.pill.s-c{background:#0000ff;color:#fff}.pill.s-na{background:var(--soft);color:var(--sub)}
 .nae .ach{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .nae .ach div{border-radius:10px;padding:6px 8px;font-size:13px;line-height:1.3;text-align:center;background:var(--soft)}.nae .ach div b{display:block;font-size:17px}
 /* 색 기준 줄 */.scale{display:block;padding:10px 14px 6px;margin:-12px -14px 4px;border-bottom:1px solid var(--line);position:sticky;top:var(--toph,60px);z-index:3;background:var(--panel);border-radius:14px 14px 0 0}.scale+.nae{border-top:0}.scale .srow{display:flex;align-items:center;gap:8px}.scale .shd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.scale .shd button{text-align:center;font-size:13px;font-weight:700;color:var(--ink);background:#dfe5e9;border:0;border-radius:6px;padding:4px 0}.scale .shd button.on{background:var(--brand);color:#fff}.nae .ach div{padding:7px 6px!important}.nae .ach div b{font-size:16px!important}.scale b{font-size:12.5px;color:var(--sub);white-space:nowrap}.scale .gbar{flex:1;height:12px;border-radius:999px;background:linear-gradient(90deg,#c62828 0%,#ee8686 18%,#fbd0d0 31%,#ffd44d 44%,#fff0a6 56%,#bfe8cc 69%,#4fb877 82%,#1f8f4f 100%)}
@@ -370,13 +370,13 @@ function render(){
   const mark=(ok,due)=>ok?{k:"ok",t:"완료"}:ti===6?{k:"wait",t:"미완료"}:ti>due?{k:"no",t:"미완료"}:ti===due?{k:"due",t:"미완료"}:{k:"wait",t:"미완료"};
   const wkDetail=c=>{const w=c.weekly;if(!w)return[["주간 탭에 이 반 블록이 없음","miss"]];return[["이번 주 진도(단원)",w.unit],["이번 주 과제",w.hw],...(w.subBook?[["부교재 진도",w.subUnit],["부교재 과제",w.subHw]]:[])]};
   const todayT=[],weekT=[],monthT=[];
-  const dueTxt=d=>WD[d]+"요일까지";
+  const dueTxt=d=>"기한 "+WD[d];
   tc.forEach(c=>{const w=c.weekly;const m1=mark(done(c),ti),m2=mark(!!(w&&(w.unit||w.hw)),ti);
     todayT.push({cls:c.cls,sub:dayChip(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},c.mk?{m:{k:"na",t:"—"},t:c.cls+" 진도·과제",rows:[["마스터클리닉은 진도·과제 입력 없음","miss"]]}:{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
   b.classes.forEach(c=>{if(c.mk)return;const w=c.weekly,d=dayOf(c);
     const c1=w?{m:mark(!!(w.unit||w.hw),d),t:c.cls+" 단원·과제",rows:wkDetail(c),app:true,go:"수업 탭에서 입력",link:cellLink(LK.주간,w.row?"E"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 단원·과제",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
     const c2=w?{m:mark(!!w.sent,d),t:c.cls+" 주간 문자 확인",rows:[["주간 문자 발송 확인(주간 탭 M)",w.sent]],note:"문자를 보낸 뒤 주간 탭 확인란에 표시하면 ✓로 바뀝니다",link:cellLink(LK.주간,w.row?"M"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 주간 문자 확인",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
-    const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위(반별 탭 K)",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"수요일까지"};
+    const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위(반별 탭 K)",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"기한 수"};
     weekT.push({cls:c.cls,sub:dayChip(c.day)+" "+dueTxt(d),cells:[c1,c2,c3]});});
   b.todo.forEach(t=>{if(t.kind==="월간")monthT.push({t:t.text,rows:[["학사일정",t.text]],link:t.link})});
   const absL=abs.map(t=>({t,link:L.결석보강})),mkL=mk.map(t=>({t,link:L.결석보강}));
@@ -416,12 +416,13 @@ let naeF={school:"",week:"",sort:"",dir:-1,mine:false};
 const weekKey=st=>/시험/.test(st)?"시험":/완료/.test(st)?"완료":(st.match(/(\d)주차/)||[])[1]?(st.match(/(\d)주차/)[1]+"주차"):(st||"기타");
 function setTopH(){const t=$("#top");if(t&&!t.hidden)document.documentElement.style.setProperty("--toph",t.offsetHeight+"px")}
 addEventListener("resize",setTopH);
+const stClass=st=>{st=String(st||"").replace(/\s/g,"");return /^완료.*1/.test(st)?"s-c1":/^완료.*2/.test(st)?"s-c2":/^완료/.test(st)?"s-c":/시험/.test(st)?"s-ex":/3주/.test(st)?"s-3":/2주/.test(st)?"s-2":/1주/.test(st)?"s-1":/예정/.test(st)?"s-pre":"s-na"};
 function renderNae(){setTopH();
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
   const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험"];
   const chip=(v,t,cur)=>`<button data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(t)}</button>`;
-  $("#naeSchool").innerHTML=`<button data-mine="0" aria-pressed="${!naeF.mine}">전체 ${list.length}</button><button data-mine="1" aria-pressed="${naeF.mine}">담당반 ${list.filter(x=>x.teacher===boot.me.name).length}</button>`; // 학교 칩은 뺌(킴쌤 10/14: 주차로 고르면 충분)
-  $("#naeWeek").innerHTML=weeks.map(w=>chip(w,w+" "+list.filter(x=>(!naeF.mine||x.teacher===boot.me.name)&&weekKey(x.status)===w).length,naeF.week)).join(""); // 다시 누르면 해제
+  $("#naeSchool").innerHTML=`<button data-mine="0" aria-pressed="${!naeF.mine}">전체</button><button data-mine="1" aria-pressed="${naeF.mine}">담당반</button>`; // 학교 칩은 뺌(킴쌤 10/14: 주차로 고르면 충분)
+  $("#naeWeek").innerHTML=weeks.map(w=>chip(w,w,naeF.week)).join(""); // 다시 누르면 해제
   $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.mine=b.dataset.mine==="1";renderNae()});
   $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=naeF.week===b.dataset.v?"":b.dataset.v;renderNae()});
   // 정렬: 이름 / 심화 / 실력 / 교과서 — 같은 버튼을 다시 누르면 높은순 ↔ 낮은순. 학교는 묶은 채로 그 안에서 정렬
@@ -434,7 +435,7 @@ function renderNae(){setTopH();
   const box=(lab,pct,c,rec)=>`<div class="${lv(pct)}${rec?" rec":""}"><b>${esc(pct||"–")}${rec?" ★":""}</b></div>`;
   const scale=`<div class="scale"><div class="srow"><b>30%</b><div class="gbar"></div><b>90%</b></div><div class="shd">${[["adv","심화"],["std","실력"],["text","교과서"]].map(([k,t])=>`<button data-k="${k}" class="${naeF.sort===k?"on":""}">${t}${naeF.sort===k?(naeF.dir<0?" ↓":" ↑"):""}</button>`).join("")}</div></div>`;
   setTimeout(()=>document.querySelectorAll("#naeList .shd button").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(naeF.sort!==k){naeF.sort=k;naeF.dir=-1}else if(naeF.dir<0)naeF.dir=1;else naeF.sort="";renderNae()}));
-  $("#naeList").innerHTML=scale+(rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join(""):`<div class="empty">해당 학생 없음</div>`);
+  $("#naeList").innerHTML=scale+(rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill st ${stClass(x.status)}">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join(""):`<div class="empty">해당 학생 없음</div>`);
 }
 document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.dataset.p;$("#panelTitle").textContent={abs:"결석",mk:"오늘 보강",todo:"미완료"}[p];
   $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
