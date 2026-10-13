@@ -310,16 +310,44 @@ $("#attClass").onchange=renderAtt;
 const KN={영:0,공:0,일:1,이:2,삼:3,사:4,오:5,육:6,륙:6,칠:7,팔:8,구:9,십:10,백:100,천:1000};
 function koNum(w){ // 한글 수사 → 숫자 ("이십사"→24, "백이십"→120)
   let total=0,cur=0;for(const ch of w){const v=KN[ch];if(v===undefined)return null;if(v>=10){cur=(cur||1)*v;total+=cur;cur=0}else cur=v}return total+cur}
+// ---------- 교재명·학기 표기 정리 (시트1 교재 목록 기준) ----------
+const BOOKS_DEFAULT=["에이급3-2(하)", "에이급3-1(상)", "에이급2-2(하)", "에이급2-1(상)", "에이급1-2(하)", "에이급1-1(상)", "개념유형_라이트3-2", "개념유형_라이트3-1", "개념유형_라이트2-2", "개념유형_라이트2-1", "개념유형_라이트1-2", "개념유형_라이트1-1", "개념유형_파워편3-2", "개념유형_파워편3-1", "개념유형_파워편2-2", "개념유형_파워편2-1", "개념유형_파워편1-2", "개념유형_파워편1-1", "왕수학_실력6-2", "왕수학_실력6-1", "왕수학_실력5-2", "왕수학_실력5-1", "왕수학_실력4-2", "왕수학_실력4-1", "왕수학_최상위6-2", "왕수학_최상위6-1", "왕수학_최상위5-2", "왕수학_최상위5-1", "왕수학_최상위4-2", "왕수학_최상위4-1", "쏀B1-1", "쏀B1-2", "쏀B2-1", "쏀B2-2", "쏀B3-1", "쏀B3-2", "쎈B공통수학1", "일품1-1", "일품1-2", "일품2-1", "일품2-2", "일품3-1", "일품3-2", "기본정석_대수", "기본정석_공통수학2", "기본정석_공통수학1", "개념원리1-1", "쎈연산2-1", "쎈연산1-1", "rpm3-2", "rpm3-1", "rpm2-2", "rpm2-1", "rpm1-2", "rpm1-1", "왕수학_기본5-1", "왕수학_기본5-2", "왕수학_기본6-1", "왕수학_기본6-2", "실력정석_공통수학1", "실력정석_공통수학2"];
+const FAM=[ // [말하는 방식(정규식), 시트1 교재명 앞부분]
+ [/실력\s*정석/,"실력정석_"],[/기본\s*정석/,"기본정석_"],[/에이\s*급|a급/i,"에이급"],
+ [/개념\s*유형\s*라이트|개유\s*라이트|라이트/,"개념유형_라이트"],[/개념\s*유형\s*파워\s*편?|파워\s*편?/,"개념유형_파워편"],
+ [/왕수학\s*최상위|최상위/,"왕수학_최상위"],[/왕수학\s*실력|실력(?!정석)/,"왕수학_실력"],[/왕수학\s*기본|기본(?!정석)/,"왕수학_기본"],
+ [/쎈\s*연산|센\s*연산|쏀\s*연산/,"쎈연산"],[/쎈\s*비|쏀\s*비|센\s*비|쎈\s*b|쏀\s*b/i,"쏀B"],[/일품/,"일품"],[/개념\s*원리/,"개념원리"],[/알\s*피\s*엠|rpm/i,"rpm"]];
+function bookize(t,books){
+  books=books||BOOKS_DEFAULT; const Hn="[일이삼사오육]";
+  // 학년·학기: "3학년 1학기"·"삼학년 일학기"·"3 다시 1"·"삼일"(교재 뒤) → 3-1
+  t=t.replace(new RegExp("("+Hn+"|\\d)\\s*학년\\s*("+Hn+"|\\d)\\s*학기","g"),(m,a,b)=>k1(a)+"-"+k1(b));
+  t=t.replace(/(\d)\s*(?:다시|대시|대쉬|에|의)\s*(\d)(?=\s|$|[가-힣])/g,"$1-$2");
+  t=t.replace(/공통\s*수학\s*(\d)|공수\s*(\d)/g,(m,a,b)=>"공통수학"+(a||b));
+  for(const [re,fam] of FAM){
+    const r=new RegExp("("+re.source+")\\s*(?:("+Hn+"|\\d)\\s*-?\\s*("+Hn+"|\\d)|(공통수학\\d|대수))?(?=\\s|$|[^가-힣\\d])",re.flags.replace("g","")+"g");
+    t=t.replace(r,(m,_f,d1,d2,sp)=>{let num=d1?k1(d1)+"-"+k1(d2):sp?sp:"";
+      if(!num&&fam!=="기본정석_"&&fam!=="실력정석_")return m;
+      const cand=books.find(b=>b.replace(/\(.*\)$/,"")===fam+num)||books.find(b=>b.startsWith(fam+num));
+      return cand||(fam+num)});
+  }
+  return t}
+function k1(c){return /\d/.test(c)?c:String(KN[c])}
 function normalize(t){
   t=String(t||"").replace(/\s+/g," ").trim(); if(!t)return t;
-  t=t.replace(/([영공일이삼사오육륙칠팔구십백천]{1,6})(?=\s?(단원|페이지|쪽|번|회|강|차|p\b))/g,(m,w)=>{const n=koNum(w);return n===null?m:String(n)});
-  t=t.replace(/(페이지|쪽)\s*([영공일이삼사오육륙칠팔구십백천]{1,6})(?![가-힣])/g,(m,a,w)=>{const n=koNum(w);return n===null?m:a+" "+n});
-  t=t.replace(/(\d+)\s*(페이지|쪽)\s*(에서|부터)\s*(\d+)\s*(페이지|쪽)?\s*(까지)?/g,"p.$1~$4");
-  t=t.replace(/(\d+)\s*(페이지|쪽)?\s*,?\s*(\d+)\s*(페이지|쪽)\s*까지/g,(m,a,x,b,y)=>x||true?"p."+a+"~"+b:m);
-  t=t.replace(/(페이지|쪽)\s*(\d+)/g,"p.$2").replace(/(\d+)\s*(페이지|쪽)/g,"p.$1");
-  t=t.replace(/p\.(\d+)\s*(에서|부터)\s*(?:p\.)?(\d+)\s*(까지)?/g,"p.$1~$3");
-  t=t.replace(/(\d+)\s*(에서|부터)\s*(\d+)\s*(까지)/g,"$1~$3");
-  t=t.replace(/p\.(\d+)\s*,?\s*p\.(\d+)\s*까지/g,"p.$1~$2").replace(/p\.(\d+)\s+(\d+)\s*까지/g,"p.$1~$2");
+  const H="[영공일이삼사오육륙칠팔구십백천]{1,6}";
+  // 한글 수사 → 숫자 ("칠단원", "페이지 이십사", "이십사 페이지")
+  t=t.replace(new RegExp("("+H+")(?=\\s?(단원|페이지|쪽|번|회|강|차|p\\b))","g"),(m,w)=>{const n=koNum(w);return n===null?m:String(n)});
+  t=t.replace(new RegExp("(페이지|쪽)\\s*("+H+")(?![가-힣])","g"),(m,a,w)=>{const n=koNum(w);return n===null?m:a+" "+n});
+  // "페이지 24" → "24페이지" 로 통일
+  t=t.replace(/(?<![\dp.])(페이지|쪽)\s*(\d+)/g,"$2페이지");
+  // 범위: "24페이지에서 31페이지까지", "24페이지 31페이지까지", "24 31페이지까지", "24쪽부터 31쪽"
+  t=t.replace(/(\d+)\s*(?:페이지|쪽)\s*(?:에서|부터)?[\s,]*(\d+)\s*(?:페이지|쪽)?(?:\s*까지)?/g,"p.$1~$2");
+  t=t.replace(/(\d+)[\s,]+(?:에서|부터)?[\s,]*(\d+)\s*(?:페이지|쪽)\s*까지/g,"p.$1~$2");
+  // 단일: "55쪽까지" → "p.55까지"
+  t=t.replace(/(\d+)\s*(?:페이지|쪽)/g,"p.$1");
+  t=t.replace(/p\.(\d+)\s*(?:에서|부터)\s*(?:p\.)?(\d+)\s*(?:까지)?/g,"p.$1~$2");
+  t=t.replace(/(\d+)\s*(?:에서|부터)\s*(\d+)\s*까지/g,"$1~$2");
+  t=bookize(t,(boot&&boot.books)||null);
   t=t.replace(/(\d+)\s+단원/g,"$1단원").replace(/(\d+)\s+번/g,"$1번").replace(/\s*~\s*/g,"~").replace(/\s+,/g,",").replace(/ +/g," ").trim();
   return t}
 ["unit","hw","subUnit","subHw"].forEach(id=>{const el=$("#"+id);el.oninput=()=>notes[id+"|"+$("#attClass").value]=el.value;el.onchange=()=>{const v=normalize(el.value);if(v!==el.value){el.value=v;notes[id+"|"+$("#attClass").value]=v;toast("표기를 정리했습니다: "+v.slice(0,40))}}});
