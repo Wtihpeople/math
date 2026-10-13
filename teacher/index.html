@@ -140,7 +140,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     <div style="text-align:center;margin-bottom:6px"><img src="logo-dark.png" alt="라임라잇수학학원" style="height:64px"></div><h2 style="text-align:center;font-size:22px">선생님 앱</h2>
     <label for="nm">이름</label><input id="nm" placeholder="예) 김은혜" autocomplete="username">
     <label for="pin">PIN 4자리</label><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
-    <details style="margin-top:8px"><summary style="font-size:12.5px;color:var(--sub);cursor:pointer">연결 주소 (바꿀 일 없음)</summary><input id="api" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" style="margin-top:6px"></details>
+    <input id="api" type="hidden">
     <div class="err" id="lerr" hidden></div>
     <div class="row" style="margin-top:14px;justify-content:space-between">
       <button id="demo">예시 화면 보기</button>
