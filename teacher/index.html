@@ -47,7 +47,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9p
 .badges{display:flex;gap:6px;margin-left:auto}.badges button{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;padding:5px 11px;font-size:13px;border-radius:999px;white-space:nowrap}.badges button b{font-size:16px;margin-left:3px}.badges button span{margin-left:6px;opacity:.9;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}@media (max-width:640px){.badges button span{display:none}}.badges button.hot{background:#B3261E;border-color:#B3261E}
 .chk{list-style:none;margin:0;padding:0}.chk li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:9px;margin-top:6px;font-size:15.5px;line-height:1.4}.chk li.today{background:var(--bad-soft)}.chk li.week{background:var(--warn-soft)}.chk li.notice{background:var(--soft);cursor:pointer}.chk li.notice .tx{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.chk li.notice.open .tx{display:block}.chk li .dt{color:var(--sub);font-size:13px;white-space:nowrap}.chk li a{color:inherit;text-decoration:none;flex:1}.chk li a:hover{text-decoration:underline}.chk li .lk{font-size:12px;color:var(--info);white-space:nowrap}.chk li .tg{flex:none;font-size:12px;border-radius:999px;padding:2px 9px;font-weight:700;white-space:nowrap;margin-left:auto}.chk li .tg.done{background:var(--ok-soft);color:var(--ok)}.chk li .tg.todo{background:var(--bad-soft);color:var(--bad)}.chk li.isdone{opacity:.6}.chk li.isdone a,.chk li.isdone span:first-child{text-decoration:line-through}.chk li .bx{flex:none}
 .cls{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.cls .t{flex:1;min-width:0}.cls .t b{font-size:16px}.cls .t span{display:block;color:var(--sub);font-size:14px}.cls{cursor:pointer;border:2px solid transparent;flex-wrap:wrap}.cls.sel{border-color:var(--brand);background:var(--lime-soft)}.cls .wk{display:grid;grid-template-columns:auto 1fr 1fr;gap:2px 10px;margin-top:8px;font-size:13.5px;width:100%;align-items:baseline}.cls .wk b{font-size:12.5px;color:var(--sub);font-weight:500}.cls .wk .h{font-size:12px;color:var(--sub)}.cls .wk .v{min-width:0;word-break:keep-all}.cls .wk .no{color:var(--bad)}.cls .wk .ok{color:var(--ink)}
-.attp{margin:-4px 0 12px;border-top-left-radius:0;border-top-right-radius:0;border:2px solid var(--brand);border-top:0}.attp .bk{margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:6px 8px;align-items:center}.attp .bk[hidden]{display:none}.attp .bk b{grid-column:1/-1;font-size:14px}.attp .bk label{font-size:13.5px;color:var(--sub)}
+.attp{margin:-4px 0 12px;border-top-left-radius:0;border-top-right-radius:0;border:2px solid var(--brand);border-top:0}.attp .bk{margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;padding:10px 12px 12px;border-radius:12px;background:var(--lime-soft);border:1px solid var(--line)}.attp .bk[hidden]{display:none}.attp .bk b{grid-column:1/-1;font-size:15px;color:var(--brand);padding-bottom:6px;border-bottom:1px solid var(--line)}.attp .bk label{font-size:13.5px;color:var(--sub);white-space:nowrap}.attp .bk input{background:var(--card)}@media (prefers-color-scheme:dark){.attp .bk{background:rgba(255,255,255,.06)}}
 .cal{margin-top:8px}.cal .nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.cal .nav b{font-size:17px;min-width:110px;text-align:center}.cal .nav button{padding:3px 10px}
 .cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cal .wd{text-align:center;font-size:12px;color:var(--sub);padding:2px 0}.cal .wd:first-child{color:var(--bad)}.cal .wd:nth-child(7){color:var(--info)}
 .cal .d{min-height:52px;border:1px solid var(--line);border-radius:6px;padding:2px 3px;font-size:12px;background:var(--panel);overflow:hidden}.cal .d.out{opacity:.35}.cal .d .n{font-size:12px;font-weight:600}.cal .d.tod .n{background:var(--brand);color:#fff;border-radius:999px;padding:0 6px}.cal .d .ev{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:1.3;border-radius:3px;padding:0 3px;margin-top:1px}.cal .d .ev.a{background:var(--lime-soft)}.cal .d .ev.n{background:var(--bad-soft);color:var(--bad);font-weight:700}.cal .d .ev.m{background:transparent;color:var(--warn);font-weight:700;padding:0}.cal .d.m{background:var(--warn-soft)}.cal .d.m .n{color:var(--warn)}
@@ -73,8 +73,10 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .list li .t{flex:1;min-width:0}.list li small{display:block;color:var(--sub);font-size:12.5px}
 .empty{color:var(--sub);font-size:14px;padding:10px 0;text-align:center}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs button{border:0;border-radius:0;background:transparent;padding:9px 2px 7px;font-size:12px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px}
-.tabs button[aria-selected="true"]{color:var(--brand);font-weight:700}
+.tabs{padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));gap:6px}
+.tabs button{border:0;border-radius:12px;background:transparent;padding:8px 2px 7px;font-size:12px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--brand);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+@media (prefers-color-scheme:dark){.tabs button[aria-selected="true"]{background:#fff;color:#1f5c3a}}
 .tabs button .n{font-size:18px;line-height:1;font-weight:700}
 .tabs button .dot{position:absolute}
 .badge{display:inline-block;min-width:18px;text-align:center;font-size:11px;background:var(--bad);color:#fff;border-radius:999px;padding:0 5px;margin-left:3px}
@@ -135,7 +137,6 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     <button data-p="mk">보강<b id="nMk">0</b></button>
     <button data-p="todo">미완료<b id="nTodo">0</b><span id="todoHint"></span></button>
   </div>
-  <button id="refresh" aria-label="새로고침">새로고침</button>
   <button id="logout">나가기</button>
 </div>
 <div class="panel" id="panel" hidden><div class="in"><div class="row" style="justify-content:space-between"><h2 id="panelTitle" style="margin:0"></h2><button id="panelClose">닫기</button></div><ul class="chk" id="panelList"></ul></div></div>
@@ -352,21 +353,23 @@ function render(){
 document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.dataset.p;$("#panelTitle").textContent={abs:"결석",mk:"오늘 보강",todo:"미완료"}[p];
   $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
 $("#panelClose").onclick=()=>$("#panel").hidden=true;$("#panel").onclick=e=>{if(e.target.id==="panel")$("#panel").hidden=true};
+const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?(+m[1])+"/"+(+m[2]):""};
+const attMD=()=>{const v=$("#attDate").value;const m=v.match(/^\d{4}-(\d{2})-(\d{2})/);return m?(+m[1])+"/"+(+m[2]):""};
 function renderAtt(){
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
   const saved=boot.attendance;
-  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const st=boot.students[s.name]||{};const pre=st.todayAbsence;
+  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const st=boot.students[s.name]||{};const dsel=attMD();const pre=st.todayAbsence||((st.upcomingAbsence||[]).some(d=>md(d)===dsel)?{type:"결석 예정",note:""}:null);
     const cur=att[k]||(saved[k]||{}).status||(pre?"결석":"출석");
     if(pre&&!(k in notes)&&!saved[k])notes[k]=pre.note||"";
     return `<div class="att"><div class="nm">${esc(s.name)}${s.tags.length?`<small>${esc(s.tags.join("·"))}</small>`:""}${pre?`<small style="color:var(--bad)">시트에 결석 등록됨${pre.type?" · "+esc(pre.type):""}</small>`:(st.upcomingAbsence||[]).length?`<small style="color:var(--bad)">결석 예정 ${esc(st.upcomingAbsence[0])}</small>`:""}</div>
-    <div class="seg" role="group" aria-label="${esc(s.name)} 출결"><button class="a" data-k="${esc(k)}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="l" data-k="${esc(k)}" data-v="지각" aria-pressed="${cur==="지각"}">지각</button><button class="x" data-k="${esc(k)}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button></div>
+    <div class="seg" role="group" aria-label="${esc(s.name)} 출결"><button class="a" data-k="${esc(k)}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="x" data-k="${esc(k)}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button></div>
     ${cur==="결석"?`<input class="note-in" placeholder="결석 사유·메모 (특이사항에 들어감)" data-note="${esc(k)}" value="${esc(notes[k]||"")}">`:""}</div>`}).join("");
   document.querySelectorAll("#attList .seg button").forEach(bt=>bt.onclick=()=>{att[bt.dataset.k]=bt.dataset.v;renderAtt()});
   document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
   const vals=c.students.map(s=>att[c.cls+"|"+s.name]||"출석");
-  $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length} · 지각 ${vals.filter(v=>v==="지각").length}`;
+  $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length}`;
   const mb=(c.weekly&&c.weekly.mainBook)||c.book||"주교재", sb=(c.weekly&&c.weekly.subBook)||c.sub||"";
-  $("#attTitle").textContent=c.cls;$("#bookMain").textContent=mb;$("#bookSub").textContent=sb;$("#subBk").hidden=!sb;
+  $("#attTitle").textContent=c.cls;$("#bookMain").textContent="주교재 · "+mb;$("#bookSub").textContent="부교재 · "+sb;$("#subBk").hidden=!sb;
   ["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).value=notes[id+"|"+c.cls]||"");
   $("#weeklyPreview").hidden=true;
 }
@@ -425,6 +428,7 @@ $("#attSave").onclick=async()=>{
     let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
     if(!r.ok)throw new Error(r.error||"fail");
     items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});
+    try{ls.set("att|"+boot.today,JSON.stringify(boot.attendance))}catch(e){}
     ls.del("boot");toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}${r.absencesMerged?` · 사유 ${r.absencesMerged}건 보충`:""}${r.weekly&&r.weekly.ok?" · 주간 탭 기록":""}`);render();
     if(r.weekly){const w=$("#weeklyPreview");w.hidden=false;w.innerHTML=r.weekly.ok?`<b>주간 문자 미리보기 (${esc(r.weekly.week||"")})</b><pre style="white-space:pre-wrap;font:inherit;margin:6px 0 0">${esc(r.weekly.message||"(아직 비어 있음)")}</pre>`:`<span style="color:var(--bad)">주간 탭에 못 썼습니다: ${esc(r.weekly.reason||"")}</span>`;}
   }catch(e){toast(e.message==="auth"?"다시 로그인해 주세요":"저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요")}
@@ -452,11 +456,14 @@ $("#stuClass").onchange=()=>{openStu=null;renderStu()};
 
 // ---------- 시작 ----------
 function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;$("#demoBar").hidden=!demo;render();go(ls.get("tab")||"check");}
-async function load(fresh){
+let lastLoad=0;
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&!demo&&ls.get("token")&&Date.now()-lastLoad>60000)load(false,true)});
+function mergeLocalAtt(){try{const k="att|"+boot.today;const s=JSON.parse(ls.get(k)||"{}");boot.attendance=Object.assign({},boot.attendance||{},s)}catch(e){}}
+async function load(fresh,quiet){
   // 저장된 화면이 있으면 먼저 보여주고(즉시), 뒤에서 새 데이터를 받아 갱신한다
   const c=ls.get("boot"); let shown=false;
-  if(c&&!boot){try{boot=JSON.parse(c);showApp();shown=true;toast("불러오는 중…")}catch(e){}}
-  try{const r=await api({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0",all:ls.get("all")==="1"?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;ls.set("boot",JSON.stringify(r));showApp();if(shown)toast("최신으로 갱신했습니다"+(r.cached?" (2분 내 캐시)":""));}
+  if(c&&!boot){try{boot=JSON.parse(c);mergeLocalAtt();showApp();shown=true;if(!quiet)toast("불러오는 중…")}catch(e){}}
+  try{const r=await api({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0",all:ls.get("all")==="1"?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;mergeLocalAtt();lastLoad=Date.now();ls.set("boot",JSON.stringify(boot));showApp();if(shown&&!quiet)toast("최신으로 갱신했습니다");}
   catch(e){if(shown&&e.message!=="auth"){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
 }
 $("#go").onclick=async()=>{
@@ -469,9 +476,8 @@ $("#go").onclick=async()=>{
 };
 $("#demo").onclick=()=>{demo=true;boot=demoData();showApp();};
 $("#logout").onclick=()=>{ls.del("token");ls.del("boot");demo=false;att={};notes={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
-$("#refresh").onclick=()=>{if(demo){boot=demoData();render();toast("예시 화면을 새로 그렸습니다")}else{toast("새로 받는 중…");load(true)}};
 const API_DEFAULT="https://script.google.com/macros/s/AKfycbxW5BKDfh3tuWTYDIaZILVPCZwRA4Vbsk0i09XN6-eEpJgauQjHp_hn5AP7x_xM2_Ra/exec";
 $("#api").value=ls.get("api")||API_DEFAULT;
 if(ls.get("token")&&ls.get("api"))load();
-if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
+if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").then(r=>{try{r.update()}catch(e){}}).catch(()=>{});let swr=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(swr)return;swr=true;location.reload()})}catch(e){}}
 </script>
