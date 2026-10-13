@@ -203,7 +203,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     <!-- ④ 내신 현황 (구 [내신] 성취도 탭 기준) -->
     <section class="screen" id="s-nae" data-tab="nae">
       <h2>내신</h2>
-      <div class="card"><div class="chips" id="naeSchool"></div><div class="chips" id="naeWeek" style="margin-top:6px"></div></div>
+      <div class="card"><div class="chips" id="naeSchool"></div><div class="chips" id="naeWeek" style="margin-top:6px"></div><div class="chips" id="naeSort" style="margin-top:6px"></div></div>
       <div class="card" id="naeList"></div>
     </section>
     <!-- 출석·진도 입력 패널: 선택한 반 카드 바로 아래로 옮겨 붙음 -->
@@ -396,7 +396,7 @@ function render(){
   renderNae();renderCal();
 }
 // ---------- 내신 탭 (구 [내신] 성취도 기준) ----------
-let naeF={school:"",week:""};
+let naeF={school:"",week:"",sort:"",dir:-1};
 const weekKey=st=>/시험/.test(st)?"시험":/완료/.test(st)?"완료":(st.match(/(\d)주차/)||[])[1]?(st.match(/(\d)주차/)[1]+"주차"):(st||"기타");
 function renderNae(){
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
@@ -406,7 +406,14 @@ function renderNae(){
   $("#naeWeek").innerHTML=chip("","전체",naeF.week)+weeks.map(w=>chip(w,w,naeF.week)).join("");
   $("#naeSchool").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.school=b.dataset.v;renderNae()});
   $("#naeWeek").querySelectorAll("button").forEach(b=>b.onclick=()=>{naeF.week=b.dataset.v;renderNae()});
-  const rows=list.filter(x=>(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week));
+  // 정렬: 이름 / 심화 / 실력 / 교과서 — 같은 버튼을 다시 누르면 높은순 ↔ 낮은순. 학교는 묶은 채로 그 안에서 정렬
+  const SK={adv:"심화",std:"실력",text:"교과서"};
+  $("#naeSort").innerHTML=`<span style="font-size:13px;color:var(--sub);align-self:center;margin-right:2px">정렬</span>`+[["","이름"],["adv","심화"],["std","실력"],["text","교과서"]].map(([k,t])=>`<button data-k="${k}" aria-pressed="${naeF.sort===k}">${t}${naeF.sort===k&&k?(naeF.dir<0?" ↓":" ↑"):""}</button>`).join("");
+  $("#naeSort").querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(naeF.sort===k&&k)naeF.dir=-naeF.dir;else{naeF.sort=k;naeF.dir=-1}renderNae()});
+  const pv=x=>{const n=parseFloat(x[naeF.sort]);return isNaN(n)?null:n};
+  const rows=list.filter(x=>(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week))
+    .sort((p,q)=>{const sc=p.school.localeCompare(q.school,"ko");if(sc)return sc;if(!naeF.sort)return(p.grade+p.name).localeCompare(q.grade+q.name,"ko");
+      const a=pv(p),b=pv(q);if(a===null&&b===null)return 0;if(a===null)return 1;if(b===null)return -1;return naeF.dir<0?b-a:a-b});
   const lv=p=>{const n=parseFloat(p);if(isNaN(n))return"p0";return n>=90?"g3":n>=80?"g2":n>=70?"g1":n>=60?"y2":n>=50?"y1":n>=40?"r1":n>=30?"r2":"r3"};
   const box=(lab,pct,c,rec)=>`<div class="${lv(pct)}${rec?" rec":""}"><b>${esc(pct||"–")}</b>${lab}${rec?" ★":""}</div>`;
   $("#naeList").innerHTML=rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join("")+`<div class="legend" style="margin-top:10px">칸 색 = 성취도 % · 초록 70↑(90·80·70) · 노랑 50~69 · 빨강 50 미만(낮을수록 진함) · ★ = 시트의 추천(특이) 교재 · 원천: 시트 [내신] 성취도</div>`:`<div class="empty">해당 학생 없음</div>`;
