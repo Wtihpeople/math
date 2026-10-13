@@ -288,6 +288,7 @@ async function api(params){
   const u=new URL(base); Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
   const r=await fetch(u.toString(),{redirect:"follow"}); return r.json();
 }
+async function call(body){const r=await post(body);if(r&&r.error==="unknown")return api(body);return r} // v1014-02: 로그인·불러오기도 POST(주소창·기록에 PIN/토큰이 남지 않게), 옛 API면 GET
 async function post(body){
   const base=ls.get("api")||""; if(!base) throw new Error("noapi");
   const r=await fetch(base,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)}); return r.json();
@@ -304,12 +305,12 @@ const statusColor=s=>/시험/.test(s)?"bad":/주차/.test(s)&&!/완료/.test(s)?
 const dColor=d=>{const m=String(d).match(/^D-(\d+)/);return m?(+m[1]<=10?"bad":+m[1]<=21?"warn":"na"):/^D-0/.test(d)?"bad":"na"};
 
 let calYM=null, calSel=null;
-function mdToDate(md,y){const m=String(md||"").match(/(\d{1,2})\/(\d{1,2})/);if(!m)return null;return new Date(y||+boot.today.slice(0,4),+m[1]-1,+m[2]);}
+function mdToDate(md,y){const m=String(md||"").match(/(\d{1,2})\/(\d{1,2})/);if(!m)return null;if(y)return new Date(y,+m[1]-1,+m[2]);const t=new Date(boot.today+"T00:00:00"),Y=t.getFullYear();let best=null;[Y-1,Y,Y+1].forEach(yy=>{const d=new Date(yy,+m[1]-1,+m[2]);if(!best||Math.abs(d-t)<Math.abs(best-t))best=d});return best;} // 연도는 오늘에 가장 가까운 해(12월↔1월 경계)
 function events(){ // 학사일정 + 내 학생 학교 내신 → [{d:Date,txt,kind:a(학원)|m(월말)|n(내신)}]
   const b=boot,y=+b.today.slice(0,4),ev=[];
-  b.schedule.forEach(s=>{const d=mdToDate(s.date,y);if(!d)return;const m=/월말|월간|월전환/.test(s.kind||"");ev.push({d,txt:m?"월말":s.text,full:m?s.text:(s.kind?s.kind+" · ":"")+s.text,kind:m?"m":"a"})});
+  b.schedule.forEach(s=>{const d=mdToDate(s.date);if(!d)return;const m=/월말|월간|월전환/.test(s.kind||"");ev.push({d,txt:m?"월말":s.text,full:m?s.text:(s.kind?s.kind+" · ":"")+s.text,kind:m?"m":"a"})});
   const nd={};
-  mySchools().forEach(s=>{const m=String(s.period||"").match(/(\d{1,2}\/\d{1,2})[^\d~]*(?:~\s*(\d{1,2}\/\d{1,2}))?/);if(!m)return;const d1=mdToDate(m[1],y),d2=m[2]?mdToDate(m[2],y):d1;
+  mySchools().forEach(s=>{const m=String(s.period||"").match(/(\d{1,2}\/\d{1,2})[^\d~]*(?:~\s*(\d{1,2}\/\d{1,2}))?/);if(!m)return;const d1=mdToDate(m[1]),d2=m[2]?mdToDate(m[2]):d1;if(d2<d1)d2.setFullYear(d2.getFullYear()+1);
     for(let d=new Date(d1);d<=d2;d.setDate(d.getDate()+1)){const k=d.toDateString();(nd[k]=nd[k]||{d:new Date(d),schools:[],first:[]}).schools.push(s.school);if(d.getTime()===d1.getTime())nd[k].first.push(s.school+" "+(/기말/.test(s.exam||"")?"기말고사":/중간/.test(s.exam||"")?"중간고사":"내신")+"\n"+String(s.period||"").replace(/\s*~\s*/,"~"))}});
   Object.values(nd).forEach(x=>ev.push({d:x.d,txt:"내신",full:x.schools.join("·")+" 내신",kind:"n",first:x.first}));
   return ev.sort((p,q)=>p.d-q.d);}
@@ -347,6 +348,7 @@ function renderCal(){
   $("#calPrev").onclick=()=>{calYM=[M===0?Y-1:Y,(M+11)%12];calSel=null;renderCal()};$("#calNext").onclick=()=>{calYM=[M===11?Y+1:Y,(M+1)%12];calSel=null;renderCal()};
   document.querySelectorAll("#cal .d").forEach(d=>d.onclick=()=>{calSel=calSel===d.dataset.k?null:d.dataset.k;renderCal()});
 }
+const attHome={p:$("#attCard").parentNode,n:$("#attCard").nextElementSibling};
 let lists={abs:[],mk:[],todo:[]}; let selCls=null, lastHost="todayClasses";
 function selectClass(cls,el){const same=selCls===cls&&el.classList.contains("sel");document.querySelectorAll(".cls.sel").forEach(x=>x.classList.remove("sel"));const p=$("#attCard");if(same){selCls=null;p.hidden=true;return}selCls=cls;lastHost=el.closest("section").querySelector("#todayClasses")&&el.closest("#todayClasses")?"todayClasses":"allClasses";el.classList.add("sel");$("#attClass").value=cls;$("#stuClass").value=cls;openStu=null;renderStu();el.after(p);p.hidden=false;renderAtt();}
 const dayChip=d=>{const k=/월|수/.test(d)?(/6/.test(d)?"ms6":/3/.test(d)?"ms3":""):/화|목/.test(d)?(/6/.test(d)?"ht6":/3/.test(d)?"ht3":""):"";return`<span class="dchip ${k}">${esc(d)}</span>`};
@@ -362,6 +364,7 @@ function render(){
     const sec=(t,u,h,miss)=>`<div class="sec"><b>${t}</b><div class="kv2"><span>진도</span>${cell(u,miss)}</div><div class="kv2"><span>과제</span>${cell(h,miss)}</div></div>`;
     return`<div class="wk2">${sec("지난주",w.lastUnit,w.lastHw,"—")}${sec("이번 주",w.unit,w.hw,"미입력")}</div>`};
   const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><div class="hd2"><div class="ttl"><b>${esc(c.cls)}</b>${dayChip(c.day)}</div><span class="bks">${c.mk?esc(c.mk.time||""):esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span></div>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
+  {const ac=$("#attCard");if(ac&&ac.parentNode!==attHome.p)attHome.p.insertBefore(ac,attHome.n&&attHome.n.parentNode===attHome.p?attHome.n:null);}
   $("#todayClasses").innerHTML=tc.length?tc.map(card).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
   $("#allClasses").innerHTML=b.classes.length?b.classes.map(card).join(""):`<div class="empty">담당 반이 없습니다</div>`;
   document.querySelectorAll(".cls[data-att]").forEach(x=>x.onclick=e=>{if(e.target.closest("a"))return;selectClass(x.dataset.att,x)});
@@ -525,15 +528,15 @@ function normalize(t){
 ["unit","hw","subUnit","subHw"].forEach(id=>{const el=$("#"+id);el.oninput=()=>notes[id+"|"+$("#attClass").value]=el.value;el.onchange=()=>{const v=normalize(el.value);if(v!==el.value){el.value=v;notes[id+"|"+$("#attClass").value]=v;toast("표기를 정리했습니다: "+v.slice(0,40))}}});
 $("#attSave").onclick=async()=>{
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test($("#attDate").value)){toast("날짜를 먼저 골라 주세요");return}
   const items=c.students.map(s=>({name:s.name,status:curOf(c,s),note:notes[c.cls+"|"+s.name]||"",makeup:!!s.makeup,mkRow:s.mkRow||0}));
   const weekly=c.mk?null:{unit:$("#unit").value.trim(),hw:$("#hw").value.trim(),subUnit:$("#subUnit").value.trim(),subHw:$("#subHw").value.trim()};
   const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:weekly?weekly.unit:"",items,weekly,mk:c.mk||null};
   $("#attSave").disabled=true;
   try{
-    let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
+    let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:weekly&&(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
     if(!r.ok)throw new Error(r.error||"fail");
-    items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});
-    try{ls.set("att|"+boot.today,JSON.stringify(boot.attendance))}catch(e){}
+    if($("#attDate").value===boot.today){items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});try{ls.set("att|"+boot.today,JSON.stringify(boot.attendance))}catch(e){}}
     ls.del("boot");toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}${r.absencesMerged?` · 사유 ${r.absencesMerged}건 보충`:""}${r.weekly&&r.weekly.ok?" · 주간 탭 기록":""}`);render();
     if(r.weekly){const w=$("#weeklyPreview");w.hidden=false;w.innerHTML=r.weekly.ok?`<b>주간 문자 미리보기 (${esc(r.weekly.week||"")})</b><pre style="white-space:pre-wrap;font:inherit;margin:6px 0 0">${esc(r.weekly.message||"(아직 비어 있음)")}</pre>`:`<span style="color:var(--bad)">주간 탭에 못 썼습니다: ${esc(r.weekly.reason||"")}</span>`;}
   }catch(e){toast(e.message==="auth"?"다시 로그인해 주세요":"저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요")}
@@ -568,21 +571,21 @@ async function load(fresh,quiet){
   // 저장된 화면이 있으면 먼저 보여주고(즉시), 뒤에서 새 데이터를 받아 갱신한다
   const c=ls.get("boot"); let shown=false;
   if(c&&!boot){try{boot=JSON.parse(c);mergeLocalAtt();showApp();shown=true;if(!quiet)toast("불러오는 중…")}catch(e){}}
-  try{const r=await api({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0",all:ls.get("all")==="1"?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;mergeLocalAtt();lastLoad=Date.now();ls.set("boot",JSON.stringify(boot));showApp();if(shown&&!quiet)toast("최신으로 갱신했습니다");}
-  catch(e){if(shown&&e.message!=="auth"){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
+  try{const r=await call({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0",all:ls.get("all")==="1"?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;mergeLocalAtt();lastLoad=Date.now();ls.set("boot",JSON.stringify(boot));showApp();if(shown&&!quiet)toast("최신으로 갱신했습니다");}
+  catch(e){if(e.message!=="auth"&&boot){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{if(e.message==="auth")ls.del("token");$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요";$("#lerr").hidden=!$("#lerr").textContent}}
 }
 $("#go").onclick=async()=>{
   const base=$("#api").value.trim()||API_DEFAULT,name=$("#nm").value.trim(),pin=$("#pin").value.trim();
   if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
   ls.set("api",base);$("#go").disabled=true;
-  try{const r=await api({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":"연결 실패");ls.set("token",r.token);demo=false;$("#go").textContent="불러오는 중…";await load();$("#go").textContent="들어가기";}
+  try{const r=await call({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);demo=false;$("#go").textContent="불러오는 중…";await load();$("#go").textContent="들어가기";}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"주소에 연결하지 못했습니다":e.message;$("#lerr").hidden=false}
   finally{$("#go").disabled=false}
 };
 $("#demo").onclick=()=>{demo=true;boot=demoData();showApp();};
-$("#logout").onclick=()=>{ls.del("token");ls.del("boot");demo=false;att={};notes={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
+$("#logout").onclick=()=>{ls.del("token");ls.del("boot");try{Object.keys(localStorage).filter(k=>/att\|/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}demo=false;att={};notes={};boot=null;selCls=null;$("#attCard").hidden=true;$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
 const API_DEFAULT="https://script.google.com/macros/s/AKfycbxW5BKDfh3tuWTYDIaZILVPCZwRA4Vbsk0i09XN6-eEpJgauQjHp_hn5AP7x_xM2_Ra/exec";
 $("#api").value=ls.get("api")||API_DEFAULT;
 if(ls.get("token")&&ls.get("api"))load();
-if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").then(r=>{try{r.update()}catch(e){}}).catch(()=>{});let swr=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(swr)return;swr=true;location.reload()})}catch(e){}}
+if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").then(r=>{try{r.update()}catch(e){}}).catch(()=>{});let swr=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(swr||!hadCtl)return;swr=true;location.reload()})}catch(e){}}
 </script>
