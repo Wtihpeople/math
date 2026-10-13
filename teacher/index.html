@@ -158,14 +158,23 @@ h3{font-size:14px;margin:14px 0 6px;color:var(--sub);font-weight:500;letter-spac
           <select id="attClass" aria-label="반 선택" style="flex:1;min-width:0"></select>
           <input id="attDate" type="date" style="width:auto">
         </div>
-        <div id="attList" style="margin-top:8px"></div>
-        <label for="prog" style="font-size:13px;color:var(--sub);display:block;margin-top:8px">오늘 진도 (결석자 챙길 진도로도 들어감)</label>
-        <input id="prog" placeholder="예) 일품 2-2 7단원 p.84~91">
+        <p style="font-size:12.5px;color:var(--sub);margin:8px 0 4px">모두 출석으로 시작합니다. <b>결석·지각인 학생만</b> 눌러 주세요.</p>
+        <div id="attList"></div>
+        <h3>진도 · 과제 (주간 문자에 그대로 들어갑니다 · 마이크 버튼으로 말해도 됩니다)</h3>
+        <label for="unit" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">주교재 진도 <span id="bookMain" style="color:var(--ink)"></span></label>
+        <input id="unit" placeholder="예) 7단원 p.84~91" enterkeyhint="next">
+        <label for="hw" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">주교재 과제</label>
+        <input id="hw" placeholder="예) p.92~95 풀고 오답 정리" enterkeyhint="done">
+        <details style="margin-top:6px"><summary style="font-size:13px;color:var(--sub);cursor:pointer">부교재 <span id="bookSub"></span></summary>
+          <label for="subUnit" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">부교재 진도</label><input id="subUnit">
+          <label for="subHw" style="font-size:13px;color:var(--sub);display:block;margin-top:6px">부교재 과제</label><input id="subHw">
+        </details>
         <div class="row" style="margin-top:10px;justify-content:space-between">
           <span id="attSum" style="font-size:13px;color:var(--sub)"></span>
           <button class="lime" id="attSave">저장</button>
         </div>
-        <p style="font-size:12.5px;color:var(--sub);margin:8px 0 0">결석을 저장하면 결석&amp;보강 탭에 날짜·학생·진도가 한 줄 추가됩니다. 취소는 시트에서 '캔슬'로.</p>
+        <div id="weeklyPreview" class="detail" hidden></div>
+        <p style="font-size:12.5px;color:var(--sub);margin:8px 0 0">저장하면 ① 출석 탭 기록 ② 결석자는 결석&amp;보강에 날짜·학생·챙길 진도 한 줄 ③ 진도·과제는 주간 탭 이번 주 칸에 들어가 발송 문자가 완성됩니다. 같은 주에 두 번 저장하면 요일을 붙여 이어 씁니다.</p>
       </div>
     </section>
   </div>
@@ -208,7 +217,7 @@ function demoData(){
   const today=new Date(); const wd="일월화수목금토"[today.getDay()];
   const ymd=today.toISOString().slice(0,10);
   const cls=[
-    {cls:"개념1-2c",book:"개념유형 1-2",day:"월수6",teacher:"나",weekRange:"",naesinProgress:"일품1-2 5단원",students:[{name:"가온",raw:"1가온",tags:[]},{name:"나래",raw:"1나래!",tags:["신규"]},{name:"다솜",raw:"1다솜",tags:[]},{name:"라온",raw:"1라온/",tags:["전반"]},{name:"마루",raw:"1마루",tags:[]}]},
+    {cls:"개념1-2c",book:"개념유형 1-2",sub:"rpm 1-2",day:"월수6",teacher:"나",weekRange:"",naesinProgress:"일품1-2 5단원",students:[{name:"가온",raw:"1가온",tags:[]},{name:"나래",raw:"1나래!",tags:["신규"]},{name:"다솜",raw:"1다솜",tags:[]},{name:"라온",raw:"1라온/",tags:["전반"]},{name:"마루",raw:"1마루",tags:[]}]},
     {cls:"실력6-1b",book:"실력 6-1",day:"화목3",teacher:"나",weekRange:"3단계 초6-1 3~4단원",naesinProgress:"",students:[{name:"바다",raw:"6바다",tags:[]},{name:"사랑",raw:"6사랑.",tags:["우수"]},{name:"아람",raw:"6아람;",tags:["미흡"]}]},
     {cls:"공수1b",book:"쎈b 공수1",day:"화목6",teacher:"나",weekRange:"",naesinProgress:"",students:[{name:"자람",raw:"자람",tags:[]},{name:"차돌",raw:"차돌",tags:[]}]}];
   const st={
@@ -279,29 +288,32 @@ function render(){
 function renderAtt(){
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
   const saved=boot.attendance;
-  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const cur=att[k]||(saved[k]||{}).status||"";const st=boot.students[s.name]||{};
+  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const cur=att[k]||(saved[k]||{}).status||"출석";const st=boot.students[s.name]||{};
     return `<div class="att"><div class="nm">${esc(s.name)}${s.tags.length?`<small>${esc(s.tags.join("·"))}</small>`:""}${(st.upcomingAbsence||[]).length?`<small style="color:var(--bad)">결석 예정 ${esc(st.upcomingAbsence[0])}</small>`:""}</div>
     <div class="seg" role="group" aria-label="${esc(s.name)} 출결"><button class="a" data-k="${esc(k)}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="l" data-k="${esc(k)}" data-v="지각" aria-pressed="${cur==="지각"}">지각</button><button class="x" data-k="${esc(k)}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button></div>
     ${cur==="결석"?`<input class="note-in" placeholder="결석 사유·메모 (특이사항에 들어감)" data-note="${esc(k)}" value="${esc(notes[k]||"")}">`:""}</div>`}).join("");
   document.querySelectorAll("#attList .seg button").forEach(bt=>bt.onclick=()=>{att[bt.dataset.k]=bt.dataset.v;renderAtt()});
   document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
-  const vals=c.students.map(s=>att[c.cls+"|"+s.name]).filter(Boolean);
-  $("#attSum").textContent=vals.length?`${vals.length}/${c.students.length} 표시 · 결석 ${vals.filter(v=>v==="결석").length}`:"한 명씩 눌러 주세요";
-  $("#prog").value=notes["prog|"+c.cls]||"";
+  const vals=c.students.map(s=>att[c.cls+"|"+s.name]||"출석");
+  $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length} · 지각 ${vals.filter(v=>v==="지각").length}`;
+  $("#bookMain").textContent=c.book?"("+c.book+")":"";$("#bookSub").textContent=c.sub?"("+c.sub+")":"";
+  ["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).value=notes[id+"|"+c.cls]||"");
+  $("#weeklyPreview").hidden=true;
 }
 $("#attClass").onchange=renderAtt;
-$("#prog").oninput=()=>notes["prog|"+$("#attClass").value]=$("#prog").value;
+["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).oninput=()=>notes[id+"|"+$("#attClass").value]=$("#"+id).value);
 $("#attSave").onclick=async()=>{
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
-  const items=c.students.filter(s=>att[c.cls+"|"+s.name]).map(s=>({name:s.name,status:att[c.cls+"|"+s.name],note:notes[c.cls+"|"+s.name]||""}));
-  if(!items.length){toast("표시한 학생이 없습니다");return}
-  const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:$("#prog").value,items};
+  const items=c.students.map(s=>({name:s.name,status:att[c.cls+"|"+s.name]||"출석",note:notes[c.cls+"|"+s.name]||""}));
+  const weekly={unit:$("#unit").value.trim(),hw:$("#hw").value.trim(),subUnit:$("#subUnit").value.trim(),subHw:$("#subHw").value.trim()};
+  const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:weekly.unit,items,weekly};
   $("#attSave").disabled=true;
   try{
-    let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length}}else r=await post(body);
+    let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length,weekly:(weekly.unit||weekly.hw)?{ok:true,week:"이번 주",message:"반갑습니다.\n라임라잇수학입니다.\n금주 진도상황 & 과제 안내드립니다.\n\n▶진도\n"+c.book+" : "+boot.weekday+" "+weekly.unit+"\n\n▶과제\n"+c.book+" : "+boot.weekday+" "+weekly.hw+"\n\n충분히 고민할 수 있도록 지도 부탁드립니다^^"}:null}}else r=await post(body);
     if(!r.ok)throw new Error(r.error||"fail");
     items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});
-    toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}`);render();
+    toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}${r.weekly&&r.weekly.ok?" · 주간 탭 기록":""}`);render();
+    if(r.weekly){const w=$("#weeklyPreview");w.hidden=false;w.innerHTML=r.weekly.ok?`<b>주간 문자 미리보기 (${esc(r.weekly.week||"")})</b><pre style="white-space:pre-wrap;font:inherit;margin:6px 0 0">${esc(r.weekly.message||"(아직 비어 있음)")}</pre>`:`<span style="color:var(--bad)">주간 탭에 못 썼습니다: ${esc(r.weekly.reason||"")}</span>`;}
   }catch(e){toast(e.message==="auth"?"다시 로그인해 주세요":"저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요")}
   finally{$("#attSave").disabled=false}
 };
