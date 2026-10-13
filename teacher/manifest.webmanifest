@@ -1,6 +1,6 @@
 {
-  "name": "라임라잇 선생님",
-  "short_name": "라임라잇",
+  "name": "라임라잇수학 선생님",
+  "short_name": "라임라잇수학",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
