@@ -132,7 +132,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .grid3{display:block}
 .pctabs{display:none}
 @media (min-width:960px){
-  .pctabs{display:flex;gap:6px;margin-bottom:10px}.pctabs button{border-radius:999px;padding:7px 16px;font-weight:700;font-size:15px;background:var(--panel)}.pctabs button[aria-selected="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .pctabs{display:flex;gap:6px;margin:-14px 0 10px;padding:14px 0 10px;position:sticky;top:var(--toph,60px);z-index:5;background:var(--bg)}.scale{top:calc(var(--toph,60px) + var(--pch,0px))}.pctabs button{border-radius:999px;padding:7px 16px;font-weight:700;font-size:15px;background:var(--panel)}.pctabs button[aria-selected="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
   .tabs{display:none}
   .wrap{padding-bottom:30px}
   .grid3{display:grid;grid-template-columns:minmax(300px,1fr) 2fr;gap:16px;align-items:start}
@@ -192,7 +192,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     </section>
   </div>
   <div class="col right">
-    <nav class="pctabs" id="pctabs"><button data-go="today">오늘 수업</button><button data-go="cls">수업</button><button data-go="nae">내신</button><button data-go="sch">일정</button></nav>
+    <nav class="pctabs" id="pctabs"><button data-go="today">오늘 수업</button><button data-go="cls">수업</button><button data-go="nae">내신</button><button data-go="sch">학사일정</button></nav>
     <!-- ② 오늘 수업 -->
     <section class="screen" id="s-today" data-tab="today">
       <h2 id="todayTitle">오늘 수업</h2>
@@ -236,7 +236,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <div class="col bottom">
     <!-- ③ 일정 달력 -->
     <section class="screen" id="s-sch" data-tab="sch">
-      <h2>일정</h2>
+      <h2>학사일정</h2>
       <div class="card cal" id="cal"></div>
     </section>
   </div>
@@ -250,7 +250,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <button data-go="today"><span class="n">오늘</span></button>
   <button data-go="cls"><span class="n">수업</span></button>
   <button data-go="nae"><span class="n">내신</span></button>
-  <button data-go="sch"><span class="n">일정</span></button>
+  <button data-go="sch"><span class="n">학사일정</span></button>
 </nav>
 <div class="toast" id="toast" role="status"></div>
 
@@ -298,7 +298,7 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 
 // ---------- 화면 ----------
 const isPC=()=>matchMedia("(min-width:960px)").matches;
-function go(id){if(!document.querySelector(`.screen[data-tab="${id}"]`))id="check";if(isPC()&&id==="check")id=ls.get("pctab")||"today";if(id!=="check")ls.set("pctab",id);document.querySelectorAll("#pctabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.dataset.tab===id));document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));ls.set("tab",id);const sc=$("#scroll");if(sc)sc.scrollTo({top:0});}
+function go(id){if(!document.querySelector(`.screen[data-tab="${id}"]`))id="check";if(isPC()&&id==="check")id=ls.get("pctab")||"today";if(id!=="check")ls.set("pctab",id);document.querySelectorAll("#pctabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.dataset.tab===id));document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));ls.set("tab",id);setTopH();const sc=$("#scroll");if(sc)sc.scrollTo({top:0});}
 document.querySelectorAll("#tabs button,#pctabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
 
 const achColor=p=>{const n=parseFloat(p);if(isNaN(n))return"na";return n>=90?"ok":n>=70?"warn":"bad"};
@@ -418,7 +418,7 @@ function render(){
 // ---------- 내신 탭 (구 [내신] 성취도 기준) ----------
 let naeF={school:"",week:"",sort:"",dir:-1,mine:false};
 const weekKey=st=>/시험/.test(st)?"시험":/완료/.test(st)?"완료":(st.match(/(\d)주차/)||[])[1]?(st.match(/(\d)주차/)[1]+"주차"):(st||"기타");
-function setTopH(){const t=$("#top");if(t&&!t.hidden)document.documentElement.style.setProperty("--toph",t.offsetHeight+"px")}
+function setTopH(){const t=$("#top"),d=document.documentElement.style;if(t&&!t.hidden)d.setProperty("--toph",t.offsetHeight+"px");const p=$("#pctabs");d.setProperty("--pch",(p&&p.offsetHeight?p.offsetHeight:0)+"px")}
 addEventListener("resize",setTopH);
 const stClass=st=>{st=String(st||"").replace(/\s/g,"");return /^완료.*1/.test(st)?"s-c1":/^완료.*2/.test(st)?"s-c2":/^완료/.test(st)?"s-c":/시험/.test(st)?"s-ex":/3주/.test(st)?"s-3":/2주/.test(st)?"s-2":/1주/.test(st)?"s-1":/예정/.test(st)?"s-pre":"s-na"};
 function renderNae(){setTopH();
