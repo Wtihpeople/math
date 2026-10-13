@@ -387,7 +387,7 @@ let naeF={school:"",week:""};
 const weekKey=st=>/시험/.test(st)?"시험":/완료/.test(st)?"완료":(st.match(/(\d)주차/)||[])[1]?(st.match(/(\d)주차/)[1]+"주차"):(st||"기타");
 function renderNae(){
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
-  const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험","완료"].filter(w=>list.some(x=>weekKey(x.status)===w));
+  const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험"];
   const chip=(v,t,cur)=>`<button data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(t)}</button>`;
   $("#naeSchool").innerHTML=chip("","전체 "+list.length,naeF.school)+schools.map(x=>chip(x,x+" "+list.filter(y=>y.school===x).length,naeF.school)).join("");
   $("#naeWeek").innerHTML=chip("","전체",naeF.week)+weeks.map(w=>chip(w,w,naeF.week)).join("");
@@ -396,7 +396,7 @@ function renderNae(){
   const rows=list.filter(x=>(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week));
   const top=c=>{if(!c)return"none";const e=Object.entries(c).map(([k,v])=>[k,+String(v).replace(/[^\d]/g,"")||0]);e.sort((p,q)=>q[1]-p[1]);return e[0][1]>0?e[0][0]:"none"};
   const box=(lab,pct,c,rec)=>`<div class="c-${top(c)}${rec?" rec":""}"><b>${esc(pct||"–")}</b>${lab}${rec?" ★":""}</div>`;
-  $("#naeList").innerHTML=rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join("")+`<div class="legend" style="margin-top:10px">칸 색 = 6색 중 가장 많은 색 · ★ = 시트의 추천(특이) 교재 · 원천: 시트 [내신] 성취도</div>`:`<div class="empty">해당 학생 없음</div>`;
+  $("#naeList").innerHTML=rows.length?rows.map(x=>`<div class="nae"><div class="who"><b>${esc(x.name)}</b><span>${esc(x.school)} ${x.grade?esc(x.grade)+"학년":""}${x.teacher?" · "+esc(x.teacher):""}</span></div><span class="pill ${statusColor(x.status)} st">${esc(x.status||"–")}</span><div class="ach">${box("심화",x.adv,x.advC,x.rec==="심화")}${box("실력",x.std,x.stdC,x.rec==="실력")}${box("교과서",x.text,x.textC,x.rec==="교과서")}</div></div>`).join("")+`<div class="legend" style="margin-top:10px">칸 색 = 6색 중 가장 많은 색 · ★ = 시트의 추천(특이) 교재 · 원천: 시트 [내신] 성취도</div>`:`<div class="empty">해당 학생 없음</div>`;
 }
 document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.dataset.p;$("#panelTitle").textContent={abs:"결석",mk:"오늘 보강",todo:"미완료"}[p];
   $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
