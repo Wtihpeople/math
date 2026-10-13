@@ -52,7 +52,7 @@ span.dchip{display:inline-block!important;padding:1px 8px;border-radius:6px;font
 .cal .d.nn{background:var(--bad-soft)}.cal .d.nn .n{color:var(--bad)}.cal .d.nn .ev.n{background:transparent;padding:0}.cal .d.m.nn{background:linear-gradient(135deg,var(--bad-soft) 50%,var(--warn-soft) 50%)}
 .cal .d.tod .n{background:var(--brand);color:#fff}
 .tag{display:inline-block;width:10px;height:10px;border-radius:3px;margin:6px 6px 0 0;flex:none}.tag.a{background:var(--lime-deep)}.tag.n{background:var(--bad)}.tag.m{background:#F0A040}
-.cal .lst{margin-top:8px}.cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
+.cal .lst{margin-top:8px}.cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;white-space:pre-line}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
 @media (max-width:640px){.cal .d{min-height:40px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px}.cal .d .ev{display:none}.cal .d .n{font-size:14px}.cal .d.a:not(.m):not(.nn){box-shadow:inset 0 -3px 0 var(--lime-deep)}}
 .sch-row{display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:15px}.sch-row:first-child{border-top:0}.sch-row b{min-width:84px}
 .panel{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:70px 16px}.panel[hidden]{display:none}.panel .in{background:var(--panel);border-radius:14px;padding:14px 16px;max-width:520px;width:100%;max-height:70vh;overflow:auto}.top .meta{margin-left:auto;font-size:12.5px;opacity:.9;text-align:right;line-height:1.3;min-width:0}
@@ -306,7 +306,7 @@ function events(){ // 학사일정 + 내 학생 학교 내신 → [{d:Date,txt,k
   b.schedule.forEach(s=>{const d=mdToDate(s.date,y);if(!d)return;const m=/월말|월간|월전환/.test(s.kind||"");ev.push({d,txt:m?"월말":s.text,full:m?s.text:(s.kind?s.kind+" · ":"")+s.text,kind:m?"m":"a"})});
   const nd={};
   mySchools().forEach(s=>{const m=String(s.period||"").match(/(\d{1,2}\/\d{1,2})[^\d~]*(?:~\s*(\d{1,2}\/\d{1,2}))?/);if(!m)return;const d1=mdToDate(m[1],y),d2=m[2]?mdToDate(m[2],y):d1;
-    for(let d=new Date(d1);d<=d2;d.setDate(d.getDate()+1)){const k=d.toDateString();(nd[k]=nd[k]||{d:new Date(d),schools:[],first:[]}).schools.push(s.school);if(d.getTime()===d1.getTime())nd[k].first.push(s.school+" 내신 "+s.period)}});
+    for(let d=new Date(d1);d<=d2;d.setDate(d.getDate()+1)){const k=d.toDateString();(nd[k]=nd[k]||{d:new Date(d),schools:[],first:[]}).schools.push(s.school);if(d.getTime()===d1.getTime())nd[k].first.push(s.school+" "+(/기말/.test(s.exam||"")?"기말고사":/중간/.test(s.exam||"")?"중간고사":"내신")+"\n"+String(s.period||"").replace(/\s*~\s*/,"~"))}});
   Object.values(nd).forEach(x=>ev.push({d:x.d,txt:"내신",full:x.schools.join("·")+" 내신",kind:"n",first:x.first}));
   return ev.sort((p,q)=>p.d-q.d);}
 function mySchools(){const b=boot,set=new Set();b.classes.forEach(c=>c.students.forEach(s=>{const n=(b.students[s.name]||{}).naesin;if(n)set.add(n.school+"|"+n.grade)}));return b.schools.filter(s=>set.size?set.has(s.school+"|"+s.grade):true);}
