@@ -5,17 +5,18 @@
 <meta name="apple-mobile-web-app-title" content="라임라잇">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:"Pretendard";font-weight:400;font-display:swap;src:url("fonts/Pretendard-Regular.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:500;font-display:swap;src:url("fonts/Pretendard-Medium.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:600;font-display:swap;src:url("fonts/Pretendard-SemiBold.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:700;font-display:swap;src:url("fonts/Pretendard-Bold.woff2") format("woff2")}
 /* 레이아웃: 폰은 한 화면에 탭 하나(아래 탭바), 컴퓨터(≥960px)는 오늘·출석·내 학생 세 단 펼침 */
 :root{
   --bg:#F2F4F0; --panel:#FFFFFF; --ink:#1B2420; --sub:#5F6A64; --line:#D9DED8; --soft:#EAEEE7;
   --brand:#3F5C4A; --brand-ink:#FFFFFF; --lime:#8DB32B; --lime-soft:#EAF2D6;
   --ok:#2E7D4F; --ok-soft:#DDF0E3; --warn:#9A6406; --warn-soft:#FBEFD6; --bad:#B3261E; --bad-soft:#F9E1DF; --info:#2F6FB3; --info-soft:#E2EDF9;
   --g:#c8e6c9; --y:#fff3b0; --r:#f4b4b4; --gr:#e4e4e4; --dk:#c9c2c2; --b:#dbe8f7;
-  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
