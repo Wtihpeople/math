@@ -40,6 +40,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9p
 .badges{display:flex;gap:6px;margin-left:auto}.badges button{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;padding:5px 11px;font-size:13px;border-radius:999px;white-space:nowrap}.badges button b{font-size:16px;margin-left:3px}.badges button span{margin-left:6px;opacity:.9;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}@media (max-width:640px){.badges button span{display:none}}.badges button.hot{background:#fff;border-color:#fff;color:var(--brand)}
 .chk{list-style:none;margin:0;padding:0}.chk li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:9px;margin-top:6px;font-size:15.5px;line-height:1.4}.chk li.today{background:var(--bad-soft)}.chk li.week{background:var(--warn-soft)}.chk li.notice{background:var(--soft);cursor:pointer}.chk li.notice .tx{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.chk li.notice.open .tx{display:block}.chk li .dt{color:var(--sub);font-size:13px;white-space:nowrap}.chk li a{color:inherit;text-decoration:none;flex:1}.chk li a:hover{text-decoration:underline}.chk li .lk{font-size:12px;color:var(--info);white-space:nowrap}.chk li .tg{flex:none;font-size:12px;border-radius:999px;padding:2px 9px;font-weight:700;white-space:nowrap;margin-left:auto}.chk li{flex-wrap:wrap;cursor:pointer}.chk li .detail{flex-basis:100%;margin:6px 0 2px 24px;padding:8px 10px;border-radius:8px;background:var(--panel);font-size:14px;line-height:1.5;color:var(--ink)}.chk li .detail .miss{color:var(--bad);font-weight:700}.chk li .detail .okv{color:var(--ok)}.chk li .detail .act{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chk li .detail .act a.sheet{font-size:12.5px;color:var(--sub)}.chk li .detail button{padding:6px 12px;font-size:13.5px}.chk li .tg.done{background:var(--ok-soft);color:var(--ok)}.chk li .tg.todo{background:var(--bad-soft);color:var(--bad)}.chk li.isdone{opacity:.6}.chk li.isdone a,.chk li.isdone span:first-child{text-decoration:line-through}.chk li .bx{flex:none}
 .cls{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.cls .t{flex:1;min-width:0}.cls .t b{font-size:16px}.cls .t span{display:block;color:var(--sub);font-size:14px}.cls{cursor:pointer;border:2px solid transparent;flex-wrap:wrap}.cls.sel{border-color:var(--lime-deep);background:var(--lime-soft)}.cls{padding:0;overflow:hidden;align-items:stretch}.cls .t{padding:0}.cls .pill{position:absolute;right:12px;top:12px}.cls{position:relative}
+.dchip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--soft);color:var(--ink)}.dchip.ms6{background:#2e7d32;color:#fff}.dchip.ms3{background:#b9e3b2;color:#1b4d20}.dchip.ht6{background:#9b1c1c;color:#fff}.dchip.ht3{background:#f5aeae;color:#6b1414}
 .cls .hd2{background:var(--lime-soft);border-bottom:1px solid var(--line);padding:10px 14px}.cls .hd2 b{display:block;font-size:17px;color:var(--brand)}.cls .hd2 span{display:block;color:var(--sub);font-size:13.5px}
 .cls .wk2{padding:8px 14px 12px;display:grid;gap:8px}.cls .wk2 .sec>b{display:block;font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:2px}
 .cls .kv2{display:grid;grid-template-columns:40px 1fr;gap:8px;font-size:14.5px;padding:2px 0}.cls .kv2>span:first-child{color:var(--sub);font-size:13px}.cls .kv2 .v{min-width:0;word-break:keep-all}.cls .kv2 .no{color:var(--bad)}.cls.sel .hd2{background:var(--lime);}.cls.sel .hd2 b,.cls.sel .hd2 span{color:#fff}
@@ -323,6 +324,7 @@ function renderCal(){
 }
 let lists={abs:[],mk:[],todo:[]}; let selCls=null, lastHost="todayClasses";
 function selectClass(cls,el){const same=selCls===cls&&el.classList.contains("sel");document.querySelectorAll(".cls.sel").forEach(x=>x.classList.remove("sel"));const p=$("#attCard");if(same){selCls=null;p.hidden=true;return}selCls=cls;lastHost=el.closest("section").querySelector("#todayClasses")&&el.closest("#todayClasses")?"todayClasses":"allClasses";el.classList.add("sel");$("#attClass").value=cls;$("#stuClass").value=cls;openStu=null;renderStu();el.after(p);p.hidden=false;renderAtt();}
+const dayChip=d=>{const k=/월|수/.test(d)?(/6/.test(d)?"ms6":/3/.test(d)?"ms3":""):/화|목/.test(d)?(/6/.test(d)?"ht6":/3/.test(d)?"ht3":""):"";return`<span class="dchip ${k}">${esc(d)}</span>`};
 function render(){
   const b=boot; $("#who").textContent=b.me.name+(b.me.role!=="선생님"?" · "+b.me.role:"");
   $("#when").textContent=b.today.slice(5).replace("-","/")+"("+b.weekday+")";
@@ -334,7 +336,7 @@ function render(){
     const w=c.weekly;if(!w)return`<div class="wk2"><div class="sec"><b>이번 주</b><div class="kv2"><span></span><span class="v no">주간 탭에 이 반 블록이 없음</span></div></div></div>`;
     const sec=(t,u,h,miss)=>`<div class="sec"><b>${t}</b><div class="kv2"><span>진도</span>${cell(u,miss)}</div><div class="kv2"><span>과제</span>${cell(h,miss)}</div></div>`;
     return`<div class="wk2">${sec("지난주",w.lastUnit,w.lastHw,"—")}${sec("이번 주",w.unit,w.hw,"미입력")}</div>`};
-  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><div class="hd2"><b>${esc(c.cls)}</b><span>${c.mk?"":esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""}${c.mk?"":" · "}${esc(c.day)}${c.mk?" · "+esc(c.mk.time||""):""}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span></div>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
+  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><div class="hd2"><b>${esc(c.cls)}</b><span>${c.mk?"":esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""}${c.mk?"":" "}${dayChip(c.day)}${c.mk?" · "+esc(c.mk.time||""):""}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span></div>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
   $("#todayClasses").innerHTML=tc.length?tc.map(card).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
   $("#allClasses").innerHTML=b.classes.length?b.classes.map(card).join(""):`<div class="empty">담당 반이 없습니다</div>`;
   document.querySelectorAll(".cls[data-att]").forEach(x=>x.onclick=e=>{if(e.target.closest("a"))return;selectClass(x.dataset.att,x)});
@@ -344,7 +346,8 @@ function render(){
   const abs=[],mk=b.myMakeups.map(m=>`${m.name} ${m.hour?m.hour+"시":""} ${m.room||"교실 미정"}`);
   Object.entries(b.attendance).forEach(([k,v])=>{if(v.status==="결석")abs.push(k.replace("|"," · ")+" 결석")});
   b.classes.forEach(c=>c.students.forEach(s=>{const st=b.students[s.name]||{};(st.upcomingAbsence||[]).forEach(d=>abs.push(`${s.name} 결석 예정 ${d} (${c.cls})`))}));
-  const L=b.links||{}; const LK=L; const cellLink=(base,a1)=>base?base.replace(/&range=.*$/,"")+(a1?"&range="+a1:""):"";
+  const L=b.links||{}; const LK=L;
+ const cellLink=(base,a1)=>base?base.replace(/&range=.*$/,"")+(a1?"&range="+a1:""):"";
   // ---- 업무 표: 반 × 항목, 기한 기준으로 ✓ / ✕(지남) / !(오늘까지) / −(기한 전) ----
   const WD="월화수목금토일"; const ti=WD.indexOf(b.weekday); // 오늘 요일 번호 (일=6 → 주 전환 전, 아무것도 재촉 안 함)
   const dayOf=c=>/월|수/.test(c.day)?2:/화|목/.test(c.day)?3:(c.weekly&&WD.indexOf(c.weekly.day)>=0?WD.indexOf(c.weekly.day):5); // 단원·과제·문자 기한: 월수→수, 화목→목
@@ -353,12 +356,12 @@ function render(){
   const todayT=[],weekT=[],monthT=[];
   const dueTxt=d=>WD[d]+"요일까지";
   tc.forEach(c=>{const w=c.weekly;const m1=mark(done(c),ti),m2=mark(!!(w&&(w.unit||w.hw)),ti);
-    todayT.push({cls:c.cls,sub:esc(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},c.mk?{m:{k:"na",t:"—"},t:c.cls+" 진도·과제",rows:[["마스터클리닉은 진도·과제 입력 없음","miss"]]}:{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
+    todayT.push({cls:c.cls,sub:dayChip(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},c.mk?{m:{k:"na",t:"—"},t:c.cls+" 진도·과제",rows:[["마스터클리닉은 진도·과제 입력 없음","miss"]]}:{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
   b.classes.forEach(c=>{if(c.mk)return;const w=c.weekly,d=dayOf(c);
     const c1=w?{m:mark(!!(w.unit||w.hw),d),t:c.cls+" 단원·과제",rows:wkDetail(c),app:true,go:"수업 탭에서 입력",link:cellLink(LK.주간,w.row?"E"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 단원·과제",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
     const c2=w?{m:mark(!!w.sent,d),t:c.cls+" 주간 문자 확인",rows:[["주간 문자 발송 확인(주간 탭 M)",w.sent]],note:"문자를 보낸 뒤 주간 탭 확인란에 표시하면 ✓로 바뀝니다",link:cellLink(LK.주간,w.row?"M"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 주간 문자 확인",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
     const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위(반별 탭 K)",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"수요일까지"};
-    weekT.push({cls:c.cls,sub:esc(c.day)+" · "+dueTxt(d),cells:[c1,c2,c3]});});
+    weekT.push({cls:c.cls,sub:dayChip(c.day)+" "+dueTxt(d),cells:[c1,c2,c3]});});
   b.todo.forEach(t=>{if(t.kind==="월간")monthT.push({t:t.text,rows:[["학사일정",t.text]],link:t.link})});
   const absL=abs.map(t=>({t,link:L.결석보강})),mkL=mk.map(t=>({t,link:L.결석보강}));
   const pendCells=rows=>rows.flatMap(r=>r.cells.filter(x=>x.m.k==="no"||x.m.k==="due"));
