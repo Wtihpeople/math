@@ -41,13 +41,14 @@ input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9p
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--brand);color:#fff;padding:10px max(16px,calc((100% - 1048px)/2));display:flex;align-items:center;gap:10px}
 .top b{font-size:18px;white-space:nowrap}.top .logo{height:34px;width:auto;border-radius:6px;background:#fff;padding:2px;flex:none}.top .logo[hidden]{display:none}
 .badges{display:flex;gap:6px;margin-left:auto}.badges button{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;padding:5px 11px;font-size:13px;border-radius:999px;white-space:nowrap}.badges button b{font-size:16px;margin-left:3px}.badges button span{margin-left:6px;opacity:.9;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}@media (max-width:640px){.badges button span{display:none}}.badges button.hot{background:#B3261E;border-color:#B3261E}
-.chk{list-style:none;margin:0;padding:0}.chk li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:9px;margin-top:6px;font-size:15.5px;line-height:1.4}.chk li.today{background:var(--bad-soft)}.chk li.week{background:var(--warn-soft)}.chk li.notice{background:var(--soft)}.chk li .dt{color:var(--sub);font-size:13px;white-space:nowrap}.chk li a{color:inherit;text-decoration:none;flex:1}.chk li a:hover{text-decoration:underline}.chk li .lk{font-size:12px;color:var(--info);white-space:nowrap}
+.chk{list-style:none;margin:0;padding:0}.chk li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:9px;margin-top:6px;font-size:15.5px;line-height:1.4}.chk li.today{background:var(--bad-soft)}.chk li.week{background:var(--warn-soft)}.chk li.notice{background:var(--soft);cursor:pointer}.chk li.notice .tx{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.chk li.notice.open .tx{display:block}.chk li .dt{color:var(--sub);font-size:13px;white-space:nowrap}.chk li a{color:inherit;text-decoration:none;flex:1}.chk li a:hover{text-decoration:underline}.chk li .lk{font-size:12px;color:var(--info);white-space:nowrap}
 .cls{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.cls .t{flex:1;min-width:0}.cls .t b{font-size:16px}.cls .t span{display:block;color:var(--sub);font-size:14px}.cls .wk{margin-top:4px;font-size:13.5px;line-height:1.45}.cls .wk b{font-size:13px;color:var(--sub);font-weight:500;margin-right:4px}
 .cal{margin-top:8px}.cal .nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.cal .nav b{font-size:17px;min-width:110px;text-align:center}.cal .nav button{padding:3px 10px}
 .cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cal .wd{text-align:center;font-size:12px;color:var(--sub);padding:2px 0}.cal .wd:first-child{color:var(--bad)}.cal .wd:nth-child(7){color:var(--info)}
-.cal .d{min-height:52px;border:1px solid var(--line);border-radius:6px;padding:2px 3px;font-size:12px;background:var(--panel);overflow:hidden}.cal .d.out{opacity:.35}.cal .d .n{font-size:12px;font-weight:600}.cal .d.tod .n{background:var(--brand);color:#fff;border-radius:999px;padding:0 6px}.cal .d .ev{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:1.3;border-radius:3px;padding:0 3px;margin-top:1px}.cal .d .ev.a{background:var(--lime-soft)}.cal .d .ev.n{background:var(--info-soft)}
+.cal .d{min-height:52px;border:1px solid var(--line);border-radius:6px;padding:2px 3px;font-size:12px;background:var(--panel);overflow:hidden}.cal .d.out{opacity:.35}.cal .d .n{font-size:12px;font-weight:600}.cal .d.tod .n{background:var(--brand);color:#fff;border-radius:999px;padding:0 6px}.cal .d .ev{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:1.3;border-radius:3px;padding:0 3px;margin-top:1px}.cal .d .ev.a{background:var(--lime-soft)}.cal .d .ev.n{background:var(--info-soft)}.cal .d .ev.m{background:#FFD9A8;color:#7A3E00;font-weight:700}.cal .d.m{background:#FFF1DE}
+.tag{display:inline-block;width:10px;height:10px;border-radius:3px;margin:6px 6px 0 0;flex:none}.tag.a{background:var(--lime)}.tag.n{background:var(--info)}.tag.m{background:#F0A040}
 .cal .lst{margin-top:8px}.cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
-@media (max-width:640px){.cal .d{min-height:34px}.cal .d .ev{font-size:0;height:5px;width:5px;border-radius:999px;display:inline-block;margin:2px 1px 0}.cal .d .ev.a{background:var(--lime)}.cal .d .ev.n{background:var(--info)}}
+@media (max-width:640px){.cal .d{min-height:34px}.cal .d .ev{font-size:0;height:5px;width:5px;border-radius:999px;display:inline-block;margin:2px 1px 0}.cal .d .ev.a{background:var(--lime)}.cal .d .ev.n{background:var(--info)}.cal .d .ev.m{background:#F0A040}}
 .sch-row{display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:15px}.sch-row:first-child{border-top:0}.sch-row b{min-width:84px}
 .panel{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:70px 16px}.panel[hidden]{display:none}.panel .in{background:var(--panel);border-radius:14px;padding:14px 16px;max-width:520px;width:100%;max-height:70vh;overflow:auto}.top .meta{margin-left:auto;font-size:12.5px;opacity:.9;text-align:right;line-height:1.3;min-width:0}
 .top button{background:transparent;color:#fff;border-color:rgba(255,255,255,.4);padding:4px 8px;font-size:12px;white-space:nowrap}
@@ -233,9 +234,9 @@ function demoData(){
   return {ok:true,me:{name:"예시 선생님",role:"선생님"},today:ymd,weekday:wd,classes:cls,todayClasses:cls.filter(c=>c.day.includes(wd)||wd==="일"||wd==="토").map(c=>c.cls).slice(0,2),attendance:{},students:st,
     myMakeups:[{name:"라온",date:"10/5(월)",makeupDate:(today.getMonth()+1)+"/"+today.getDate(),hour:"18",room:"4층 2호",progress:"일품1-2 4단원"}],
     notices:[{date:"10/13",to:"전체",text:"수요일까지 반별 K열에 주간진단 범위를 적어 주세요. 안 적힌 반은 출제하지 않습니다.",by:"킴쌤"},{date:"10/11",to:"월수반",text:"10/27(월) 2학기 중간 여명중 범위: 4.좌표와 그래프 ~ 5.도형의 기초(삼각형의 합동).",by:"교무"}],
-    schedule:[{date:"10/27",kind:"월말",text:"10월 월말평가 주"},{date:"11/1",kind:"행사",text:"반별 시트 월 전환(자동)"},{date:"11/9",kind:"내신",text:"내신 개편 시작"}],
+    schedule:[{date:"10/23",kind:"월말",text:"월말 진단 주간"},{date:"10/24",kind:"월말",text:"월말 진단 주간"},{date:"11/1",kind:"행사",text:"반별 시트 월 전환(자동)"},{date:"11/9",kind:"내신",text:"내신 개편 시작"}],
     schools:[{school:"여명중",grade:"1",status:"2주차",exam:"2학기 중간",period:"10/26(월) ~ 10/27(화)",count:"27 (18/9)"},{school:"부곡중",grade:"1",status:"3주차",exam:"2학기 중간",period:"10/13(화) ~ 10/14(수)",count:"1 (0/1)"},{school:"거성중",grade:"1",status:"완료2주차",exam:"2학기 중간",period:"9/28(월) ~ 9/29(화)",count:"8 (5/3)"}],
-    todo:[{kind:"주간진단",text:"개념1-2c 주간진단 범위 미입력",cls:"개념1-2c",link:"https://docs.google.com/spreadsheets/"},{kind:"주간문자",text:"공수1b 주간 문자 미발송",link:"https://docs.google.com/spreadsheets/"},{kind:"보강",text:"보강일 미정 2건",link:"https://docs.google.com/spreadsheets/"},{kind:"월간",text:"10/27 월말평가 주 — 범위 확정",link:"https://docs.google.com/spreadsheets/"}],generated:"지금"};
+    todo:[{kind:"주간진단",text:"개념1-2c 주간진단 범위 미입력",cls:"개념1-2c",link:"https://docs.google.com/spreadsheets/"},{kind:"주간문자",text:"공수1b 주간 문자 미발송",link:"https://docs.google.com/spreadsheets/"},{kind:"보강",text:"보강일 미정 2건",link:"https://docs.google.com/spreadsheets/"},{kind:"월간",text:"10/23 월말 진단 주간 — 범위 확정",link:"https://docs.google.com/spreadsheets/"}],generated:"지금"};
 }
 
 // ---------- 통신 ----------
@@ -260,11 +261,13 @@ const dColor=d=>{const m=String(d).match(/^D-(\d+)/);return m?(+m[1]<=10?"bad":+
 
 let calYM=null, calSel=null;
 function mdToDate(md,y){const m=String(md||"").match(/(\d{1,2})\/(\d{1,2})/);if(!m)return null;return new Date(y||+boot.today.slice(0,4),+m[1]-1,+m[2]);}
-function events(){ // 학사일정 + 내 학생 학교 내신 → [{d:Date,txt,kind}]
+function events(){ // 학사일정 + 내 학생 학교 내신 → [{d:Date,txt,kind:a(학원)|m(월말)|n(내신)}]
   const b=boot,y=+b.today.slice(0,4),ev=[];
-  b.schedule.forEach(s=>{const d=mdToDate(s.date,y);if(d)ev.push({d,txt:(s.kind?s.kind+" · ":"")+s.text,kind:"a"})});
-  mySchools().forEach(s=>{const m=String(s.period||"").match(/(\d{1,2}\/\d{1,2})[^\d]*(?:~\s*(\d{1,2}\/\d{1,2}))?/);if(!m)return;const d1=mdToDate(m[1],y),d2=m[2]?mdToDate(m[2],y):d1;
-    for(let d=new Date(d1);d<=d2;d.setDate(d.getDate()+1))ev.push({d:new Date(d),txt:s.school+" 내신",kind:"n",first:d.getTime()===d1.getTime(),period:s.period})});
+  b.schedule.forEach(s=>{const d=mdToDate(s.date,y);if(!d)return;const m=/월말|월간|월전환/.test(s.kind||"");ev.push({d,txt:m?"월말":s.text,full:m?s.text:(s.kind?s.kind+" · ":"")+s.text,kind:m?"m":"a"})});
+  const nd={};
+  mySchools().forEach(s=>{const m=String(s.period||"").match(/(\d{1,2}\/\d{1,2})[^\d~]*(?:~\s*(\d{1,2}\/\d{1,2}))?/);if(!m)return;const d1=mdToDate(m[1],y),d2=m[2]?mdToDate(m[2],y):d1;
+    for(let d=new Date(d1);d<=d2;d.setDate(d.getDate()+1)){const k=d.toDateString();(nd[k]=nd[k]||{d:new Date(d),schools:[],first:[]}).schools.push(s.school);if(d.getTime()===d1.getTime())nd[k].first.push(s.school+" 내신 "+s.period)}});
+  Object.values(nd).forEach(x=>ev.push({d:x.d,txt:"내신",full:x.schools.join("·")+" 내신",kind:"n",first:x.first}));
   return ev.sort((p,q)=>p.d-q.d);}
 function mySchools(){const b=boot,set=new Set();b.classes.forEach(c=>c.students.forEach(s=>{const n=(b.students[s.name]||{}).naesin;if(n)set.add(n.school+"|"+n.grade)}));return b.schools.filter(s=>set.size?set.has(s.school+"|"+s.grade):true);}
 function renderCal(){
@@ -272,13 +275,13 @@ function renderCal(){
   const [Y,M]=calYM,first=new Date(Y,M,1),start=new Date(Y,M,1-first.getDay()),ev=events();
   const key=d=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();const by={};ev.forEach(e=>{(by[key(e.d)]=by[key(e.d)]||[]).push(e)});
   let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),out=d.getMonth()!==M,tod=k===key(t);const es=by[k]||[];
-    cells+=`<div class="d${out?" out":""}${tod?" tod":""}" data-k="${k}"><span class="n">${d.getDate()}</span>${es.slice(0,3).map(e=>`<span class="ev ${e.kind}">${esc(e.txt)}</span>`).join("")}</div>`;}
-  const monthEv=ev.filter(e=>e.d.getMonth()===M&&e.d.getFullYear()===Y&&(e.kind==="a"||e.first));
+    cells+=`<div class="d${out?" out":""}${tod?" tod":""}${es.some(e=>e.kind==="m")?" m":""}" data-k="${k}"><span class="n">${d.getDate()}</span>${es.slice(0,3).map(e=>`<span class="ev ${e.kind}">${esc(e.txt)}</span>`).join("")}</div>`;}
+  const monthEv=[];ev.filter(e=>e.d.getMonth()===M&&e.d.getFullYear()===Y).forEach(e=>{if(e.kind==="n"){(e.first||[]).forEach(t=>monthEv.push({d:e.d,txt:t,kind:"n"}))}else monthEv.push({d:e.d,txt:e.full,kind:e.kind})});
   const sel=calSel?ev.filter(e=>key(e.d)===calSel):null;
   $("#cal").innerHTML=`<div class="nav"><button id="calPrev">◀</button><b>${Y}년 ${M+1}월</b><button id="calNext">▶</button></div>
-  <div class="g">${"일월화수목금토".split("").map(w=>`<div class="wd">${w}</div>`).join("")}${cells}</div>
-  <div class="lst">${sel?`<h3 style="margin:10px 0 4px">${esc(calSel.replace(/^\d+-/,"").replace("-","/"))}</h3>${sel.length?sel.map(e=>`<div class="d2"><span>${esc(e.txt)}${e.period?" "+esc(e.period):""}</span></div>`).join(""):`<div class="empty">일정 없음</div>`}`:""}
-  <h3 style="margin:10px 0 4px">${M+1}월 전체</h3>${monthEv.length?monthEv.map(e=>`<div class="d2"><span class="dd">${e.d.getMonth()+1}/${e.d.getDate()}(${"일월화수목금토"[e.d.getDay()]})</span><span>${esc(e.txt)}${e.period?" "+esc(e.period):""}</span></div>`).join(""):`<div class="empty">이 달 일정이 없습니다 (시트 '학사일정' 탭)</div>`}</div>`;
+  <div class="g">${"일월화수목금토".split("").map(w=>`<div class="wd">${w}</div>`).join("")}${cells}</div><div style="font-size:12.5px;color:var(--sub);margin-top:6px"><span class="tag m"></span>월말 진단 <span class="tag n"></span>내신(내 학생 학교) <span class="tag a"></span>학원 일정</div>
+  <div class="lst">${sel?`<h3 style="margin:10px 0 4px">${esc(calSel.replace(/^\d+-/,"").replace("-","/"))}</h3>${sel.length?sel.map(e=>`<div class="d2"><span class="tag ${e.kind}"></span><span>${esc(e.full||e.txt)}</span></div>`).join(""):`<div class="empty">일정 없음</div>`}`:""}
+  <h3 style="margin:10px 0 4px">${M+1}월 상세</h3>${monthEv.length?monthEv.map(e=>`<div class="d2"><span class="dd">${e.d.getMonth()+1}/${e.d.getDate()}(${"일월화수목금토"[e.d.getDay()]})</span><span class="tag ${e.kind}"></span><span>${esc(e.txt)}</span></div>`).join(""):`<div class="empty">이 달 일정이 없습니다 (시트 '학사일정' 탭)</div>`}</div>`;
   $("#calPrev").onclick=()=>{calYM=[M===0?Y-1:Y,(M+11)%12];calSel=null;renderCal()};$("#calNext").onclick=()=>{calYM=[M===11?Y+1:Y,(M+1)%12];calSel=null;renderCal()};
   document.querySelectorAll("#cal .d").forEach(d=>d.onclick=()=>{calSel=calSel===d.dataset.k?null:d.dataset.k;renderCal()});
 }
@@ -308,12 +311,13 @@ function render(){
   $("#nAbs").textContent=abs.length;$("#nMk").textContent=mk.length;$("#nTodo").textContent=lists.todo.length;
   $("#todoHint").textContent=lists.todo.length?lists.todo[0].t.replace(/^[^·]+· /,"")+(lists.todo.length>1?" 외 "+(lists.todo.length-1):""):"";
   document.querySelectorAll("#badges button").forEach(x=>x.classList.toggle("hot",x.dataset.p==="todo"&&todayT.length>0));
-  const item=x=>x.app?`<a href="#" data-att="${esc(x.cls)}">☐ ${esc(x.t)}</a>`:x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">☐ ${esc(x.t)}</a><span class="lk">시트 ↗</span>`:`<span>☐ ${esc(x.t)}</span>`;
+  const item=x=>x.app?`<a href="#" data-att="${esc(x.cls)}">☐ ${esc(x.t)}</a>`:x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">☐ ${esc(x.t)}</a>`:`<span>☐ ${esc(x.t)}</span>`;
   const li=(arr,cls,empty)=>arr.length?arr.map(x=>`<li class="${cls}">${item(x)}</li>`).join(""):`<li class="empty">${empty}</li>`;
   $("#todoToday").innerHTML=li(todayT,"today","다 끝났습니다");$("#todoWeek").innerHTML=li(weekT,"week","이번 주 밀린 것 없음");$("#todoMonth").innerHTML=li(monthT,"week","이번 달 월간 업무 없음 (학사일정 탭 종류 '월간')");
   document.querySelectorAll("#todoToday [data-att]").forEach(x=>x.onclick=e=>{e.preventDefault();$("#attClass").value=x.dataset.att;renderAtt();go("today");$("#attCard").scrollIntoView({behavior:"smooth",block:"start"})});
   $("#todoN").hidden=!todayT.length;$("#todoN").textContent=todayT.length;
-  $("#notices").innerHTML=b.notices.length?b.notices.map(n=>`<li class="notice"><span class="dt">${esc(n.date)}</span><span>${esc(n.text)}</span></li>`).join(""):`<li class="empty">공지 없음</li>`;
+  $("#notices").innerHTML=b.notices.length?b.notices.map(n=>`<li class="notice"><span class="dt">${esc(n.date)}</span><span class="tx">${esc(n.text)}</span></li>`).join(""):`<li class="empty">공지 없음</li>`;
+  document.querySelectorAll("#notices .notice").forEach(x=>x.onclick=()=>x.classList.toggle("open"));
   // 반 선택
   const opts=[...b.classes].sort((x,y)=>(b.todayClasses.includes(y.cls)-b.todayClasses.includes(x.cls))).map(c=>`<option value="${esc(c.cls)}">${esc(c.cls)} · ${esc(c.day)}${b.todayClasses.includes(c.cls)?" · 오늘":""}</option>`).join("");
   $("#attClass").innerHTML=opts;$("#stuClass").innerHTML=opts;
@@ -325,7 +329,7 @@ function render(){
   renderCal();
 }
 document.querySelectorAll("#badges button").forEach(x=>x.onclick=()=>{const p=x.dataset.p;$("#panelTitle").textContent={abs:"결석",mk:"오늘 보강",todo:"미완료"}[p];
-  $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a><span class="lk">시트 ↗</span>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
+  $("#panelList").innerHTML=lists[p].length?lists[p].map(x=>`<li class="${p==="todo"?"today":"notice"}">${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.t)}</a>`:esc(x.t)}</li>`).join(""):`<li class="empty">없음</li>`;$("#panel").hidden=false});
 $("#panelClose").onclick=()=>$("#panel").hidden=true;$("#panel").onclick=e=>{if(e.target.id==="panel")$("#panel").hidden=true};
 function renderAtt(){
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
