@@ -130,11 +130,13 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .sched .d{display:flex;gap:10px;border-top:1px solid var(--line);padding:7px 0}.sched .d:first-child{border-top:0}
 .sched .dd{min-width:58px;font-weight:700}.sched .kind{font-size:12px;color:var(--sub);margin-right:6px}
 .grid3{display:block}
+.pctabs{display:none}
 @media (min-width:960px){
+  .pctabs{display:flex;gap:6px;margin-bottom:10px}.pctabs button{border-radius:999px;padding:7px 16px;font-weight:700;font-size:15px;background:var(--panel)}.pctabs button[aria-selected="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
   .tabs{display:none}
   .wrap{padding-bottom:30px}
   .grid3{display:grid;grid-template-columns:minmax(300px,1fr) 2fr;gap:16px;align-items:start}
-  .screen{display:block}
+  .screen{display:none}.screen.on,#s-check{display:block}
   .col{min-width:0}
   .col.left{position:sticky;top:66px;max-height:calc(100vh - 80px);overflow:auto;padding-right:2px}
   .col.bottom{grid-column:2}
@@ -184,12 +186,13 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
     <section class="screen on" id="s-check" data-tab="check">
       <div class="card" id="c-wk" style="margin-top:0"><h3 style="margin-top:0">이번 주 일정</h3><div id="wkcal"></div></div>
       <div class="card" id="c-notice"><h3 style="margin-top:0">공지사항</h3><ul class="chk" id="notices"></ul></div>
-      <div class="card" id="c-today"><h3 style="margin-top:0">일일 업무 <small style="font-weight:500;color:var(--sub)">· 오늘 수업 끝나고</small></h3><div id="todoToday"></div></div>
-      <div class="card" id="c-week"><h3 style="margin-top:0">주간 업무 <small style="font-weight:500;color:var(--sub)">· 월수반 수요일 · 화목반 목요일 · 진단 범위 수요일</small></h3><div id="todoWeek"></div><div class="legend"><span class="m ok">완료</span>입력됨 <span class="m no">미완료</span>기한 지남 <span class="m due">미완료</span>오늘까지 <span class="m wait">미완료</span>기한 전</div></div>
+      <div class="card" id="c-today"><h3 style="margin-top:0">일일 업무</h3><div id="todoToday"></div></div>
+      <div class="card" id="c-week"><h3 style="margin-top:0">주간 업무</h3><div id="todoWeek"></div></div>
       <div class="card" id="c-month"><h3 style="margin-top:0">월간 업무</h3><ul class="chk" id="todoMonth"></ul></div>
     </section>
   </div>
   <div class="col right">
+    <nav class="pctabs" id="pctabs"><button data-go="today">오늘 수업</button><button data-go="cls">수업</button><button data-go="nae">내신</button><button data-go="sch">일정</button></nav>
     <!-- ② 오늘 수업 -->
     <section class="screen" id="s-today" data-tab="today">
       <h2 id="todayTitle">오늘 수업</h2>
@@ -294,8 +297,9 @@ async function post(body){
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2200);}
 
 // ---------- 화면 ----------
-function go(id){if(!document.querySelector(`.screen[data-tab="${id}"]`))id="check";document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.dataset.tab===id));document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));ls.set("tab",id);const sc=$("#scroll");if(sc)sc.scrollTo({top:0});}
-document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
+const isPC=()=>matchMedia("(min-width:960px)").matches;
+function go(id){if(!document.querySelector(`.screen[data-tab="${id}"]`))id="check";if(isPC()&&id==="check")id=ls.get("pctab")||"today";if(id!=="check")ls.set("pctab",id);document.querySelectorAll("#pctabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.dataset.tab===id));document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));ls.set("tab",id);const sc=$("#scroll");if(sc)sc.scrollTo({top:0});}
+document.querySelectorAll("#tabs button,#pctabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
 
 const achColor=p=>{const n=parseFloat(p);if(isNaN(n))return"na";return n>=90?"ok":n>=70?"warn":"bad"};
 const statusColor=s=>/시험/.test(s)?"bad":/주차/.test(s)&&!/완료/.test(s)?"warn":/완료/.test(s)?"ok":/예정/.test(s)?"info":"na";
