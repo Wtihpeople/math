@@ -328,7 +328,7 @@ function render(){
   const cell=(v,miss)=>v?`<span class="v ok">${esc(v)}</span>`:`<span class="v no">${miss}</span>`;
   const wk=c=>{const w=c.weekly;if(!w)return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>이번 주</b><span class="v no" style="grid-column:2/-1">주간 탭에 이 반 블록이 없음</span></div>`;
     return`<div class="wk"><span class="h"></span><span class="h">진도</span><span class="h">과제</span><b>지난주</b>${cell(w.lastUnit,"—")}${cell(w.lastHw,"—")}<b>이번 주</b>${cell(w.unit,"미입력")}${cell(w.hw,"미입력")}</div>`};
-  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><b>${esc(c.cls)}</b><span>${esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""} · ${esc(c.day)}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:`<button class="primary">출석·진도</button>`}</div>`;
+  const card=c=>`<div class="cls${selCls===c.cls?" sel":""}" data-att="${esc(c.cls)}"><div class="t"><b>${esc(c.cls)}</b><span>${esc((c.weekly&&c.weekly.mainBook)||c.book||"")}${c.weekly&&c.weekly.subBook?" + "+esc(c.weekly.subBook):""} · ${esc(c.day)}${c.naesinProgress?" · 내신 "+esc(c.naesinProgress):""}</span>${wk(c)}</div>${done(c)?`<span class="pill ok">출석 완료</span>`:""}</div>`;
   $("#todayClasses").innerHTML=tc.length?tc.map(card).join(""):`<div class="empty">오늘 수업이 없습니다</div>`;
   $("#allClasses").innerHTML=b.classes.length?b.classes.map(card).join(""):`<div class="empty">담당 반이 없습니다</div>`;
   document.querySelectorAll(".cls[data-att]").forEach(x=>x.onclick=e=>{if(e.target.closest("a"))return;selectClass(x.dataset.att,x)});
