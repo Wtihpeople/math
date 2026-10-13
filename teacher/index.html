@@ -103,7 +103,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
 .detail{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px}.kv b{font-weight:500;color:var(--sub)}
 /* 내신 탭 */
-.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none}.chips button{border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;background:var(--panel)}.chips button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none}.chips button{border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;background:var(--panel)}#naeWeek button{flex:1 1 0;min-width:0;padding:6px 4px;font-size:13.5px;white-space:nowrap;text-align:center}.chips button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .nae{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}.nae:first-child{border-top:0}
 .nae .who b{font-size:16px}.nae .who span{color:var(--sub);font-size:13.5px;margin-left:6px}
 .nae .st{justify-self:end;font-weight:700}.pill.st{background:#fff;color:var(--ink);border:1px solid #c9d1d9}.pill.s-ex{background:var(--ink);color:#fff;border-color:var(--ink)}.pill.s-c1,.pill.s-c2,.pill.s-c,.pill.s-pre,.pill.s-na{color:var(--sub);border-color:var(--line);font-weight:600}
@@ -250,7 +250,7 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <button data-go="today"><span class="n">오늘</span></button>
   <button data-go="cls"><span class="n">수업</span></button>
   <button data-go="nae"><span class="n">내신</span></button>
-  <button data-go="sch"><span class="n">학사일정</span></button>
+  <button data-go="sch"><span class="n">일정</span></button>
 </nav>
 <div class="toast" id="toast" role="status"></div>
 
@@ -423,7 +423,7 @@ addEventListener("resize",setTopH);
 const stClass=st=>{st=String(st||"").replace(/\s/g,"");return /^완료.*1/.test(st)?"s-c1":/^완료.*2/.test(st)?"s-c2":/^완료/.test(st)?"s-c":/시험/.test(st)?"s-ex":/3주/.test(st)?"s-3":/2주/.test(st)?"s-2":/1주/.test(st)?"s-1":/예정/.test(st)?"s-pre":"s-na"};
 function renderNae(){setTopH();
   const list=(boot.naesinList||[]).slice().sort((p,q)=>(p.school+p.grade+p.name).localeCompare(q.school+q.grade+q.name,"ko"));
-  const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험"];
+  const schools=[...new Set(list.map(x=>x.school).filter(Boolean))], weeks=["1주차","2주차","3주차","시험","완료"];
   const chip=(v,t,cur)=>`<button data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(t)}</button>`;
   $("#naeSchool").innerHTML=`<button data-mine="0" aria-pressed="${!naeF.mine}">전체</button><button data-mine="1" aria-pressed="${naeF.mine}">담당반</button>`; // 학교 칩은 뺌(킴쌤 10/14: 주차로 고르면 충분)
   $("#naeWeek").innerHTML=weeks.map(w=>chip(w,w,naeF.week)).join(""); // 다시 누르면 해제
@@ -432,7 +432,7 @@ function renderNae(){setTopH();
   // 정렬: 이름 / 심화 / 실력 / 교과서 — 같은 버튼을 다시 누르면 높은순 ↔ 낮은순. 학교는 묶은 채로 그 안에서 정렬
   const SK={adv:"심화",std:"실력",text:"교과서"};
   const pv=x=>{const n=parseFloat(x[naeF.sort]);return isNaN(n)?null:n};
-  const rows=list.filter(x=>(!naeF.mine||x.teacher===boot.me.name)&&(!naeF.school||x.school===naeF.school)&&(!naeF.week||weekKey(x.status)===naeF.week))
+  const rows=list.filter(x=>(!naeF.mine||x.teacher===boot.me.name)&&(!naeF.school||x.school===naeF.school)&&(naeF.week?weekKey(x.status)===naeF.week:weekKey(x.status)!=="완료"))
     .sort((p,q)=>{const sc=p.school.localeCompare(q.school,"ko");if(sc)return sc;if(!naeF.sort)return(p.grade+p.name).localeCompare(q.grade+q.name,"ko");
       const a=pv(p),b=pv(q);if(a===null&&b===null)return 0;if(a===null)return 1;if(b===null)return -1;return naeF.dir<0?b-a:a-b});
   const lv=p=>{const n=parseFloat(p);if(isNaN(n))return"p0";return n>=90?"g3":n>=80?"g2":n>=70?"g1":n>=60?"y2":n>=50?"y1":n>=40?"r1":n>=30?"r2":"r3"};
