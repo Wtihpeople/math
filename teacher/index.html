@@ -351,7 +351,7 @@ let lists={abs:[],mk:[],todo:[]}; let selCls=null, lastHost="todayClasses";
 function selectClass(cls,el){const same=selCls===cls&&el.classList.contains("sel");document.querySelectorAll(".cls.sel").forEach(x=>x.classList.remove("sel"));const p=$("#attCard");if(same){selCls=null;p.hidden=true;return}selCls=cls;lastHost=el.closest("section").querySelector("#todayClasses")&&el.closest("#todayClasses")?"todayClasses":"allClasses";el.classList.add("sel");$("#attClass").value=cls;$("#stuClass").value=cls;openStu=null;renderStu();el.after(p);p.hidden=false;renderAtt();}
 const dayChip=d=>{const k=/월|수/.test(d)?(/6/.test(d)?"ms6":/3/.test(d)?"ms3":""):/화|목/.test(d)?(/6/.test(d)?"ht6":/3/.test(d)?"ht3":""):"";return`<span class="dchip ${k}">${esc(d)}</span>`};
 function render(){
-  const b=boot; $("#meName").innerHTML=esc(b.me.name)+" 선생님"+(/원장/.test(b.me.role||"")?`<span class="role">${esc(b.me.role)}</span>`:""); $("#tday").textContent=b.today.slice(5).replace("-","/").replace(/^0/,"").replace("/0","/")+"("+b.weekday+")"; $("#who").textContent=b.me.name+(b.me.role!=="선생님"?" · "+b.me.role:"");
+  const b=boot; $("#meName").textContent=b.me.name+" "+({"김지환":"원장님","장선희":"부원장님","김영신":"실장님"}[b.me.name]||"선생님"); $("#tday").textContent=b.today.slice(5).replace("-","/").replace(/^0/,"").replace("/0","/")+"("+b.weekday+")"; $("#who").textContent=b.me.name+(b.me.role!=="선생님"?" · "+b.me.role:"");
   $("#when").textContent=b.today.slice(5).replace("-","/")+"("+b.weekday+")";
   $("#todayTitle").textContent="오늘 수업 · "+b.today.slice(5).replace("-","/")+"("+b.weekday+")";
   const tc=b.classes.filter(c=>b.todayClasses.includes(c.cls));
