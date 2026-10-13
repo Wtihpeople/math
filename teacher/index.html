@@ -1,0 +1,348 @@
+<title>라임라잇 선생님</title>
+<meta name="theme-color" content="#3f5c4a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="라임라잇">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 폰은 한 화면에 탭 하나(아래 탭바), 컴퓨터(≥960px)는 오늘·출석·내 학생 세 단 펼침 */
+:root{
+  --bg:#F2F4F0; --panel:#FFFFFF; --ink:#1B2420; --sub:#5F6A64; --line:#D9DED8; --soft:#EAEEE7;
+  --brand:#3F5C4A; --brand-ink:#FFFFFF; --lime:#8DB32B; --lime-soft:#EAF2D6;
+  --ok:#2E7D4F; --ok-soft:#DDF0E3; --warn:#9A6406; --warn-soft:#FBEFD6; --bad:#B3261E; --bad-soft:#F9E1DF; --info:#2F6FB3; --info-soft:#E2EDF9;
+  --g:#c8e6c9; --y:#fff3b0; --r:#f4b4b4; --gr:#e4e4e4; --dk:#c9c2c2; --b:#dbe8f7;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --panel:#1B2320; --ink:#E6EBE7; --sub:#9AA69F; --line:#2C3631; --soft:#232D28;
+  --brand:#2F4A3A; --lime:#B5D94E; --lime-soft:#2A3417;
+  --ok:#6FD3AE; --ok-soft:#16352B; --warn:#F2C063; --warn-soft:#3A2D12; --bad:#F29A85; --bad-soft:#3D1F18; --info:#8DB8EA; --info-soft:#1B2C42;
+  --g:#2f5a33; --y:#5a5020; --r:#6a2f2f; --gr:#3a3f3c; --dk:#4a4444; --b:#2a3d55; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --panel:#1B2320; --ink:#E6EBE7; --sub:#9AA69F; --line:#2C3631; --soft:#232D28;
+  --brand:#2F4A3A; --lime:#B5D94E; --lime-soft:#2A3417;
+  --ok:#6FD3AE; --ok-soft:#16352B; --warn:#F2C063; --warn-soft:#3A2D12; --bad:#F29A85; --bad-soft:#3D1F18; --info:#8DB8EA; --info-soft:#1B2C42;
+  --g:#2f5a33; --y:#5a5020; --r:#6a2f2f; --gr:#3a3f3c; --dk:#4a4444; --b:#2a3d55; color-scheme:dark}
+*{box-sizing:border-box} html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px}
+button.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:700}
+button.lime{background:var(--lime);color:#1B2420;border-color:var(--lime);font-weight:700}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--panel);width:100%}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.top b{font-size:17px;white-space:nowrap}.top .meta{margin-left:auto;font-size:12.5px;opacity:.9;text-align:right;line-height:1.3;min-width:0}
+.top button{background:transparent;color:#fff;border-color:rgba(255,255,255,.4);padding:4px 8px;font-size:12px;white-space:nowrap}
+@media (max-width:420px){.top b{font-size:15px}.top .meta{font-size:11.5px}}
+.wrap{max-width:1180px;margin:0 auto;padding-block:14px 84px;padding-inline:16px}
+.screen{display:none;min-width:0}.screen.on{display:block}
+h2{font-size:18px;margin:0 0 8px;text-wrap:balance}
+h3{font-size:14px;margin:14px 0 6px;color:var(--sub);font-weight:500;letter-spacing:.02em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px;min-width:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 9px;font-weight:500;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.info{background:var(--info-soft);color:var(--info)}.pill.na{background:var(--soft);color:var(--sub)}
+.list{list-style:none;margin:0;padding:0}.list li{border-top:1px solid var(--line);padding:9px 0;display:flex;gap:10px;align-items:flex-start}.list li:first-child{border-top:0}
+.list li .t{flex:1;min-width:0}.list li small{display:block;color:var(--sub);font-size:12.5px}
+.empty{color:var(--sub);font-size:14px;padding:10px 0;text-align:center}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(5,1fr);background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{border:0;border-radius:0;background:transparent;padding:9px 2px 7px;font-size:12px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs button[aria-selected="true"]{color:var(--brand);font-weight:700}
+.tabs button .n{font-size:18px;line-height:1;font-weight:700}
+.tabs button .dot{position:absolute}
+.badge{display:inline-block;min-width:18px;text-align:center;font-size:11px;background:var(--bad);color:#fff;border-radius:999px;padding:0 5px;margin-left:3px}
+/* 출석 */
+.att{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border-top:1px solid var(--line);padding:8px 0}
+.att:first-child{border-top:0}
+.att .nm{font-weight:500}.att .nm small{color:var(--sub);font-weight:400;font-size:12px;margin-left:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:7px 12px;background:transparent;font-size:14px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"].a{background:var(--ok-soft);color:var(--ok);font-weight:700}
+.seg button[aria-pressed="true"].x{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.seg button[aria-pressed="true"].l{background:var(--warn-soft);color:var(--warn);font-weight:700}
+.note-in{grid-column:1/-1}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+/* 학생 */
+.stu{border-top:1px solid var(--line);padding:9px 0;cursor:pointer}
+.stu:first-child{border-top:0}
+.stu .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.stu .hd b{font-size:15px}
+.stu .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:3px;border:1px solid rgba(0,0,0,.08)}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--soft);margin:6px 0 2px}
+.bar i{display:block;height:100%}
+.detail{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px}.kv b{font-weight:500;color:var(--sub)}
+/* 로그인 */
+.login{max-width:420px;margin:40px auto}
+.login label{display:block;font-size:13px;color:var(--sub);margin-top:10px}
+.login .err{color:var(--bad);font-size:13.5px;margin-top:8px}
+.demo{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:6px 10px;font-size:13px;margin-top:10px;text-align:center}
+.sched .d{display:flex;gap:10px;border-top:1px solid var(--line);padding:7px 0}.sched .d:first-child{border-top:0}
+.sched .dd{min-width:58px;font-weight:700}.sched .kind{font-size:12px;color:var(--sub);margin-right:6px}
+.grid3{display:block}
+@media (min-width:960px){
+  .tabs{display:none}
+  .wrap{padding-bottom:30px}
+  .grid3{display:grid;grid-template-columns:1fr 1.1fr 1.2fr;gap:14px;align-items:start}
+  .screen{display:block}
+  .col{min-width:0}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+<div class="top" id="top" hidden>
+  <b>라임라잇 선생님</b>
+  <div class="meta"><span id="who"></span><br><span id="when"></span></div>
+  <button id="refresh" aria-label="새로고침">새로고침</button>
+  <button id="logout">나가기</button>
+</div>
+
+<div class="wrap">
+  <!-- 로그인 -->
+  <div class="login card" id="login">
+    <h2 style="text-align:center;font-size:24px">라임라잇 선생님</h2>
+    <p style="color:var(--sub);margin:0;text-align:center;font-size:14px">교무실 시트를 폰에서 봅니다. 쓰는 건 출석과 결석뿐입니다.</p>
+    <label for="api">앱 주소 (실장이 알려준 주소)</label><input id="api" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    <label for="nm">이름</label><input id="nm" placeholder="예) 김은혜" autocomplete="username">
+    <label for="pin">PIN 4자리</label><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <div class="err" id="lerr" hidden></div>
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <button id="demo">예시 화면 보기</button>
+      <button class="primary" id="go">들어가기</button>
+    </div>
+    <p style="font-size:12.5px;color:var(--sub);margin:12px 0 0">폰 홈화면에 넣기: 사파리 공유 → "홈 화면에 추가" / 크롬 메뉴 → "홈 화면에 추가". 이후 앱처럼 열립니다.</p>
+  </div>
+
+  <div id="app" hidden>
+  <div class="demo" id="demoBar" hidden>예시 데이터입니다. 실제 학생이 아닙니다.</div>
+  <div class="grid3">
+  <div class="col">
+    <!-- ① 오늘 -->
+    <section class="screen on" id="s-today" data-tab="today">
+      <h2 id="todayTitle">오늘</h2>
+      <div class="card">
+        <h3 style="margin-top:0">내 수업</h3>
+        <ul class="list" id="todayClasses"></ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">오늘 들어오는 보강</h3>
+        <ul class="list" id="todayMakeups"></ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">미리 알아둘 것</h3>
+        <ul class="list" id="heads"></ul>
+      </div>
+    </section>
+    <!-- ④ 할 일 -->
+    <section class="screen" id="s-todo" data-tab="todo">
+      <h2>할 일 · 공지</h2>
+      <div class="card"><h3 style="margin-top:0">자동 체크</h3><ul class="list" id="todo"></ul></div>
+      <div class="card"><h3 style="margin-top:0">공지</h3><ul class="list" id="notices"></ul></div>
+    </section>
+  </div>
+  <div class="col">
+    <!-- ② 출석 -->
+    <section class="screen" id="s-att" data-tab="att">
+      <h2>출석</h2>
+      <div class="card">
+        <div class="row">
+          <select id="attClass" aria-label="반 선택" style="flex:1;min-width:0"></select>
+          <input id="attDate" type="date" style="width:auto">
+        </div>
+        <div id="attList" style="margin-top:8px"></div>
+        <label for="prog" style="font-size:13px;color:var(--sub);display:block;margin-top:8px">오늘 진도 (결석자 챙길 진도로도 들어감)</label>
+        <input id="prog" placeholder="예) 일품 2-2 7단원 p.84~91">
+        <div class="row" style="margin-top:10px;justify-content:space-between">
+          <span id="attSum" style="font-size:13px;color:var(--sub)"></span>
+          <button class="lime" id="attSave">저장</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--sub);margin:8px 0 0">결석을 저장하면 결석&amp;보강 탭에 날짜·학생·진도가 한 줄 추가됩니다. 취소는 시트에서 '캔슬'로.</p>
+      </div>
+    </section>
+  </div>
+  <div class="col">
+    <!-- ③ 내 학생 -->
+    <section class="screen" id="s-stu" data-tab="stu">
+      <h2>내 학생</h2>
+      <div class="card">
+        <select id="stuClass" aria-label="반 선택"></select>
+        <div id="stuList" style="margin-top:6px"></div>
+      </div>
+    </section>
+    <!-- ⑥ 일정 -->
+    <section class="screen" id="s-sch" data-tab="sch">
+      <h2>일정</h2>
+      <div class="card sched"><h3 style="margin-top:0">학원 일정</h3><div id="sched"></div></div>
+      <div class="card sched"><h3 style="margin-top:0">학교별 내신 (내 학생이 있는 학교)</h3><div id="schools"></div></div>
+    </section>
+  </div>
+  </div>
+  </div>
+</div>
+
+<nav class="tabs" id="tabs" hidden aria-label="화면">
+  <button data-go="today" aria-selected="true"><span class="n">오늘</span></button>
+  <button data-go="att"><span class="n">출석</span></button>
+  <button data-go="stu"><span class="n">내 학생</span></button>
+  <button data-go="todo"><span class="n">할 일<span class="badge" id="todoN" hidden></span></span></button>
+  <button data-go="sch"><span class="n">일정</span></button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s), esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+let boot=null, demo=false, att={}, notes={};
+
+// ---------- 예시 데이터 (가상 인물) ----------
+function demoData(){
+  const today=new Date(); const wd="일월화수목금토"[today.getDay()];
+  const ymd=today.toISOString().slice(0,10);
+  const cls=[
+    {cls:"개념1-2c",book:"개념유형 1-2",day:"월수6",teacher:"나",weekRange:"",naesinProgress:"일품1-2 5단원",students:[{name:"가온",raw:"1가온",tags:[]},{name:"나래",raw:"1나래!",tags:["신규"]},{name:"다솜",raw:"1다솜",tags:[]},{name:"라온",raw:"1라온/",tags:["전반"]},{name:"마루",raw:"1마루",tags:[]}]},
+    {cls:"실력6-1b",book:"실력 6-1",day:"화목3",teacher:"나",weekRange:"3단계 초6-1 3~4단원",naesinProgress:"",students:[{name:"바다",raw:"6바다",tags:[]},{name:"사랑",raw:"6사랑.",tags:["우수"]},{name:"아람",raw:"6아람;",tags:["미흡"]}]},
+    {cls:"공수1b",book:"쎈b 공수1",day:"화목6",teacher:"나",weekRange:"",naesinProgress:"",students:[{name:"자람",raw:"자람",tags:[]},{name:"차돌",raw:"차돌",tags:[]}]}];
+  const st={
+    가온:{naesin:{school:"여명중",grade:"1",exam:"2학기 중간",dday:"D-14",status:"2주차",start:"10/12(월)",back:"10/28(수)",end:"11/9(월)",progress:"일품1-2 5단원"},ach:{rec:"심화",adv:"52%",advC:{green:41,yellow:12,red:5,gray:2,skull:3,none:16},std:"96%",stdC:{green:117,yellow:3,red:1,gray:0,skull:1,none:0},text:"95%",textC:{green:94,yellow:4,red:0,gray:0,skull:1,none:0}},absences:[{date:"9/30(수)",type:"정규수업",makeupDate:"10/3(토)",hour:"14",done:"완료"}],pendingMakeup:0,upcomingAbsence:[]},
+    나래:{naesin:{school:"거성중",grade:"1",exam:"2학기 중간",dday:"D+14",status:"완료2주차",start:"",back:"",end:"",progress:""},ach:{rec:"교과서",adv:"33%",advC:{green:26,yellow:15,red:8,gray:10,skull:2,none:18},std:"71%",stdC:{green:80,yellow:20,red:9,gray:3,skull:4,none:6},text:"78%",textC:{green:72,yellow:12,red:5,gray:2,skull:2,none:3}},absences:[{date:"10/7(수)",type:"정규수업",makeupDate:"",hour:"",done:""}],pendingMakeup:1,upcomingAbsence:[]},
+    다솜:{naesin:{school:"부곡중",grade:"1",exam:"2학기 중간",dday:"D-1",status:"3주차",start:"9/21(월)",back:"10/15(목)",end:"10/27(화)",progress:"일품1-2 5단원"},ach:{rec:"서술형",adv:"88%",advC:{green:70,yellow:6,red:2,gray:0,skull:0,none:1},std:"97%",stdC:{green:118,yellow:2,red:0,gray:0,skull:0,none:2},text:"98%",textC:{green:96,yellow:1,red:0,gray:0,skull:0,none:0}},absences:[],pendingMakeup:0,upcomingAbsence:["10/15(목)"]},
+    라온:{naesin:null,ach:null,absences:[{date:"10/5(월)",type:"정규수업",makeupDate:"10/10(토)",hour:"10",done:""},{date:"9/16(수)",type:"정규수업",makeupDate:"9/19(토)",hour:"14",done:"완료"}],pendingMakeup:1,upcomingAbsence:[]},
+    마루:{naesin:null,ach:null,absences:[],pendingMakeup:0,upcomingAbsence:[]},
+    바다:{naesin:null,ach:null,absences:[],pendingMakeup:0,upcomingAbsence:[]},사랑:{naesin:null,ach:null,absences:[],pendingMakeup:0,upcomingAbsence:[]},아람:{naesin:null,ach:null,absences:[{date:"10/8(목)",type:"정규수업",makeupDate:"",hour:"",done:""}],pendingMakeup:1,upcomingAbsence:[]},
+    자람:{naesin:null,ach:null,absences:[],pendingMakeup:0,upcomingAbsence:[]},차돌:{naesin:null,ach:null,absences:[],pendingMakeup:0,upcomingAbsence:[]}};
+  return {ok:true,me:{name:"예시 선생님",role:"선생님"},today:ymd,weekday:wd,classes:cls,todayClasses:cls.filter(c=>c.day.includes(wd)||wd==="일"||wd==="토").map(c=>c.cls).slice(0,2),attendance:{},students:st,
+    myMakeups:[{name:"라온",date:"10/5(월)",makeupDate:(today.getMonth()+1)+"/"+today.getDate(),hour:"18",room:"4층 2호",progress:"일품1-2 4단원"}],
+    notices:[{date:"10/13",to:"전체",text:"수요일까지 반별 K열에 주간진단 범위를 적어 주세요. 안 적힌 반은 출제하지 않습니다.",by:"킴쌤"},{date:"10/11",to:"월수반",text:"10/27(월) 2학기 중간 여명중 범위: 4.좌표와 그래프 ~ 5.도형의 기초(삼각형의 합동).",by:"교무"}],
+    schedule:[{date:"10/27",kind:"월말",text:"10월 월말평가 주"},{date:"11/1",kind:"행사",text:"반별 시트 월 전환(자동)"},{date:"11/9",kind:"내신",text:"내신 개편 시작"}],
+    schools:[{school:"여명중",grade:"1",status:"2주차",exam:"2학기 중간",period:"10/26(월) ~ 10/27(화)",count:"27 (18/9)"},{school:"부곡중",grade:"1",status:"3주차",exam:"2학기 중간",period:"10/13(화) ~ 10/14(수)",count:"1 (0/1)"},{school:"거성중",grade:"1",status:"완료2주차",exam:"2학기 중간",period:"9/28(월) ~ 9/29(화)",count:"8 (5/3)"}],
+    todo:[{kind:"주간진단",text:"개념1-2c 주간진단 범위 미입력",cls:"개념1-2c"},{kind:"주간문자",text:"공수1b 주간 문자 미발송"},{kind:"보강",text:"보강일 미정 2건"}],generated:"지금"};
+}
+
+// ---------- 통신 ----------
+async function api(params){
+  const base=ls.get("api")||""; if(!base) throw new Error("noapi");
+  const u=new URL(base); Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+  const r=await fetch(u.toString(),{redirect:"follow"}); return r.json();
+}
+async function post(body){
+  const base=ls.get("api")||""; if(!base) throw new Error("noapi");
+  const r=await fetch(base,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)}); return r.json();
+}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2200);}
+
+// ---------- 화면 ----------
+function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.dataset.tab===id));document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===id));ls.set("tab",id);window.scrollTo({top:0});}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+const achColor=p=>{const n=parseFloat(p);if(isNaN(n))return"na";return n>=90?"ok":n>=70?"warn":"bad"};
+const statusColor=s=>/시험/.test(s)?"bad":/주차/.test(s)&&!/완료/.test(s)?"warn":/완료/.test(s)?"ok":/예정/.test(s)?"info":"na";
+const dColor=d=>{const m=String(d).match(/^D-(\d+)/);return m?(+m[1]<=10?"bad":+m[1]<=21?"warn":"na"):/^D-0/.test(d)?"bad":"na"};
+
+function render(){
+  const b=boot; $("#who").textContent=b.me.name+(b.me.role!=="선생님"?" · "+b.me.role:"");
+  $("#when").textContent=b.today.slice(5).replace("-","/")+"("+b.weekday+") · "+b.generated+" 기준";
+  $("#todayTitle").textContent="오늘 "+b.today.slice(5).replace("-","/")+"("+b.weekday+")";
+  // 오늘
+  const tc=b.classes.filter(c=>b.todayClasses.includes(c.cls));
+  $("#todayClasses").innerHTML=tc.length?tc.map(c=>{const done=Object.keys(b.attendance).some(k=>k.startsWith(c.cls+"|"));return `<li><span class="t"><b>${esc(c.cls)}</b> <span class="pill na">${esc(c.day)}</span><small>${esc(c.book)} · ${c.students.length}명${c.naesinProgress?" · 내신 진도 "+esc(c.naesinProgress):""}</small></span>${done?`<span class="pill ok">출석 완료</span>`:`<button data-att="${esc(c.cls)}">출석 부르기</button>`}</li>`}).join(""):`<li class="empty">오늘 수업이 없습니다</li>`;
+  document.querySelectorAll("[data-att]").forEach(x=>x.onclick=()=>{$("#attClass").value=x.dataset.att;renderAtt();go("att")});
+  $("#todayMakeups").innerHTML=b.myMakeups.length?b.myMakeups.map(m=>`<li><span class="t"><b>${esc(m.name)}</b> ${m.hour?esc(m.hour)+"시":""} ${m.room?`<span class="pill info">${esc(m.room)}</span>`:`<span class="pill bad">교실 미정</span>`}<small>결석 ${esc(m.date)}${m.progress?" · 챙길 진도 "+esc(m.progress):""}</small></span></li>`).join(""):`<li class="empty">오늘 내가 맡은 보강이 없습니다</li>`;
+  const heads=[];
+  b.classes.forEach(c=>c.students.forEach(s=>{const st=b.students[s.name]||{};(st.upcomingAbsence||[]).forEach(d=>heads.push(`<li><span class="t"><b>${esc(s.name)}</b> 결석 예정 ${esc(d)}<small>${esc(c.cls)}</small></span></li>`));
+    const n=st.naesin;if(n&&/^D-(\d+)/.test(n.dday)&&+n.dday.match(/\d+/)[0]<=21&&/예정|1주차/.test(n.status))heads.push(`<li><span class="t"><b>${esc(s.name)}</b> ${esc(n.school)} ${esc(n.exam)} ${esc(n.dday)} · 내신 ${esc(n.status)}<small>${esc(c.cls)} · 전환 ${esc(n.start)}</small></span></li>`);
+    s.tags.forEach(t=>{if(t==="신규"||t==="전반")heads.push(`<li><span class="t"><b>${esc(s.name)}</b> ${t==="신규"?"신규 확정 — 교재 안내 문자 확인":"전반 대상 — 교재 문자 확인"}<small>${esc(c.cls)}</small></span></li>`)});}));
+  $("#heads").innerHTML=heads.length?heads.join(""):`<li class="empty">특별히 없습니다</li>`;
+  // 할 일
+  $("#todo").innerHTML=b.todo.length?b.todo.map(t=>`<li><span class="pill ${t.kind==="보강"?"warn":"bad"}">${esc(t.kind)}</span><span class="t">${esc(t.text)}</span></li>`).join(""):`<li class="empty">밀린 것이 없습니다</li>`;
+  $("#todoN").hidden=!b.todo.length;$("#todoN").textContent=b.todo.length;
+  $("#notices").innerHTML=b.notices.length?b.notices.map(n=>`<li><span class="t">${esc(n.text)}<small>${esc(n.date)} · ${esc(n.to)}${n.by?" · "+esc(n.by):""}</small></span></li>`).join(""):`<li class="empty">공지가 없습니다 (시트 '공지' 탭에 적으면 여기 보입니다)</li>`;
+  // 반 선택
+  const opts=[...b.classes].sort((x,y)=>(b.todayClasses.includes(y.cls)-b.todayClasses.includes(x.cls))).map(c=>`<option value="${esc(c.cls)}">${esc(c.cls)} · ${esc(c.day)}${b.todayClasses.includes(c.cls)?" · 오늘":""}</option>`).join("");
+  $("#attClass").innerHTML=opts;$("#stuClass").innerHTML=opts;
+  $("#attDate").value=b.today;
+  renderAtt();renderStu();
+  // 일정
+  $("#sched").innerHTML=b.schedule.length?b.schedule.map(s=>`<div class="d"><span class="dd">${esc(s.date)}</span><span><span class="kind">${esc(s.kind)}</span>${esc(s.text)}</span></div>`).join(""):`<div class="empty">학사 일정이 없습니다 (시트 '학사일정' 탭)</div>`;
+  const mySchools=new Set();b.classes.forEach(c=>c.students.forEach(s=>{const n=(b.students[s.name]||{}).naesin;if(n)mySchools.add(n.school+"|"+n.grade)}));
+  const sc=b.schools.filter(s=>mySchools.size?mySchools.has(s.school+"|"+s.grade):true);
+  $("#schools").innerHTML=sc.length?sc.map(s=>`<div class="d"><span class="dd">${esc(s.school)} ${esc(s.grade)}</span><span><span class="pill ${statusColor(s.status)}">${esc(s.status)}</span> ${esc(s.exam)} ${esc(s.period)}<br><small style="color:var(--sub)">우리 학생 ${esc(s.count)}</small></span></div>`).join(""):`<div class="empty">내신 대상 학생이 없습니다</div>`;
+}
+function renderAtt(){
+  const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
+  const saved=boot.attendance;
+  $("#attList").innerHTML=c.students.map(s=>{const k=c.cls+"|"+s.name;const cur=att[k]||(saved[k]||{}).status||"";const st=boot.students[s.name]||{};
+    return `<div class="att"><div class="nm">${esc(s.name)}${s.tags.length?`<small>${esc(s.tags.join("·"))}</small>`:""}${(st.upcomingAbsence||[]).length?`<small style="color:var(--bad)">결석 예정 ${esc(st.upcomingAbsence[0])}</small>`:""}</div>
+    <div class="seg" role="group" aria-label="${esc(s.name)} 출결"><button class="a" data-k="${esc(k)}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="l" data-k="${esc(k)}" data-v="지각" aria-pressed="${cur==="지각"}">지각</button><button class="x" data-k="${esc(k)}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button></div>
+    ${cur==="결석"?`<input class="note-in" placeholder="결석 사유·메모 (특이사항에 들어감)" data-note="${esc(k)}" value="${esc(notes[k]||"")}">`:""}</div>`}).join("");
+  document.querySelectorAll("#attList .seg button").forEach(bt=>bt.onclick=()=>{att[bt.dataset.k]=bt.dataset.v;renderAtt()});
+  document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
+  const vals=c.students.map(s=>att[c.cls+"|"+s.name]).filter(Boolean);
+  $("#attSum").textContent=vals.length?`${vals.length}/${c.students.length} 표시 · 결석 ${vals.filter(v=>v==="결석").length}`:"한 명씩 눌러 주세요";
+  $("#prog").value=notes["prog|"+c.cls]||"";
+}
+$("#attClass").onchange=renderAtt;
+$("#prog").oninput=()=>notes["prog|"+$("#attClass").value]=$("#prog").value;
+$("#attSave").onclick=async()=>{
+  const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
+  const items=c.students.filter(s=>att[c.cls+"|"+s.name]).map(s=>({name:s.name,status:att[c.cls+"|"+s.name],note:notes[c.cls+"|"+s.name]||""}));
+  if(!items.length){toast("표시한 학생이 없습니다");return}
+  const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:$("#prog").value,items};
+  $("#attSave").disabled=true;
+  try{
+    let r; if(demo){await new Promise(r=>setTimeout(r,400));r={ok:true,saved:items.length,absencesAdded:items.filter(i=>i.status==="결석").length}}else r=await post(body);
+    if(!r.ok)throw new Error(r.error||"fail");
+    items.forEach(i=>boot.attendance[c.cls+"|"+i.name]={status:i.status});
+    toast(`저장했습니다 · ${r.saved}명${r.absencesAdded?` · 결석 ${r.absencesAdded}건 등록`:""}`);render();
+  }catch(e){toast(e.message==="auth"?"다시 로그인해 주세요":"저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요")}
+  finally{$("#attSave").disabled=false}
+};
+const six=(c)=>{if(!c)return"";const k=[["green","var(--g)"],["yellow","var(--y)"],["red","var(--r)"],["gray","var(--gr)"],["skull","var(--dk)"],["none","var(--b)"]];const tot=k.reduce((s,[a])=>s+(+c[a]||0),0)||1;return`<div class="bar">${k.map(([a,col])=>`<i style="width:${(+c[a]||0)/tot*100}%;background:${col}" title="${a} ${c[a]}"></i>`).join("")}</div>`};
+let openStu=null;
+function renderStu(){
+  const c=boot.classes.find(x=>x.cls===$("#stuClass").value); if(!c){$("#stuList").innerHTML="";return}
+  $("#stuList").innerHTML=c.students.map(s=>{const st=boot.students[s.name]||{};const n=st.naesin,a=st.ach;const chips=[];
+    if(n&&n.exam)chips.push(`<span class="pill ${statusColor(n.status)}">${esc(n.school)} ${esc(n.status)}</span>`,n.dday?`<span class="pill ${dColor(n.dday)}">${esc(n.dday)}</span>`:"");
+    if(a)chips.push(`<span class="pill ${achColor(a.adv)}">심화 ${esc(a.adv)}</span>`,`<span class="pill ${achColor(a.std)}">실력 ${esc(a.std)}</span>`,`<span class="pill ${achColor(a.text)}">교과서 ${esc(a.text)}</span>`);
+    if(st.pendingMakeup)chips.push(`<span class="pill warn">보강일 미정 ${st.pendingMakeup}</span>`);
+    (st.upcomingAbsence||[]).forEach(d=>chips.push(`<span class="pill bad">결석 예정 ${esc(d)}</span>`));
+    s.tags.forEach(t=>chips.push(`<span class="pill na">${esc(t)}</span>`));
+    const open=openStu===s.name;
+    return `<div class="stu" data-s="${esc(s.name)}"><div class="hd"><b>${esc(s.name)}</b>${chips.length?"":`<span class="pill na">특이 없음</span>`}</div><div class="chips">${chips.join("")}</div>
+    ${open?`<div class="detail">${n&&n.exam?`<div class="kv"><b>내신</b><span>${esc(n.school)} ${esc(n.grade)}학년 · ${esc(n.exam)} ${esc(n.dday)} · ${esc(n.status)}</span><b>전환·복귀</b><span>${esc(n.start||"—")} → ${esc(n.back||"—")} · 보강 종료 ${esc(n.end||"—")}</span><b>내신 진도</b><span>${esc(n.progress||"—")}</span>${a?`<b>추천</b><span>${esc(a.rec)}</span>`:""}</div>`:`<div class="kv"><b>내신</b><span>대상 아님</span></div>`}
+    ${a?`<div style="margin-top:6px;font-size:13px">심화 ${esc(a.adv)}${six(a.advC)}실력 ${esc(a.std)}${six(a.stdC)}교과서 ${esc(a.text)}${six(a.textC)}<small style="color:var(--sub)"><span class="sw" style="background:var(--g)"></span>초록 <span class="sw" style="background:var(--y)"></span>노랑 <span class="sw" style="background:var(--r)"></span>빨강 <span class="sw" style="background:var(--gr)"></span>회색 <span class="sw" style="background:var(--dk)"></span>해골 <span class="sw" style="background:var(--b)"></span>미응시</small></div>`:""}
+    <h3 style="margin:8px 0 4px">결석·보강 이력</h3>${(st.absences||[]).length?`<ul class="list">${st.absences.slice().reverse().map(x=>`<li><span class="t">${esc(x.date)} ${esc(x.type||"")}<small>${x.makeupDate?`보강 ${esc(x.makeupDate)} ${x.hour?esc(x.hour)+"시":""} ${x.room?esc(x.room):""} ${x.makeupTeacher?"· "+esc(x.makeupTeacher):""}`:"보강일 미정"}${x.progress?" · 진도 "+esc(x.progress):""}</small></span><span class="pill ${x.done?"ok":x.makeupDate?"info":"warn"}">${esc(x.done||(x.makeupDate?"예정":"미정"))}</span></li>`).join("")}</ul>`:`<div class="empty">결석 없음</div>`}
+    <div class="kv" style="margin-top:6px"><b>주간진단</b><span>매쓰홀릭 점수 수집 연결 뒤 표시</span><b>마클 특이</b><span>연결 예정</span></div></div>`:""}</div>`}).join("");
+  document.querySelectorAll("#stuList .stu").forEach(d=>d.onclick=e=>{if(e.target.closest("a,button"))return;openStu=openStu===d.dataset.s?null:d.dataset.s;renderStu()});
+}
+$("#stuClass").onchange=()=>{openStu=null;renderStu()};
+
+// ---------- 시작 ----------
+function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;$("#demoBar").hidden=!demo;render();go(ls.get("tab")||"today");}
+async function load(){
+  try{const r=await api({a:"bootstrap",t:ls.get("token")||""});if(!r.ok)throw new Error(r.error||"fail");boot=r;ls.set("boot",JSON.stringify(r));showApp();}
+  catch(e){const c=ls.get("boot");if(c&&e.message!=="auth"){boot=JSON.parse(c);showApp();toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
+}
+$("#go").onclick=async()=>{
+  const base=$("#api").value.trim(),name=$("#nm").value.trim(),pin=$("#pin").value.trim();
+  if(!base||!name||!pin){$("#lerr").textContent="주소·이름·PIN을 모두 적어 주세요";$("#lerr").hidden=false;return}
+  ls.set("api",base);$("#go").disabled=true;
+  try{const r=await api({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":"연결 실패");ls.set("token",r.token);demo=false;await load();}
+  catch(e){$("#lerr").textContent=e.message.includes("fetch")?"주소에 연결하지 못했습니다":e.message;$("#lerr").hidden=false}
+  finally{$("#go").disabled=false}
+};
+$("#demo").onclick=()=>{demo=true;boot=demoData();showApp();};
+$("#logout").onclick=()=>{ls.del("token");ls.del("boot");demo=false;att={};notes={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
+$("#refresh").onclick=()=>{if(demo){boot=demoData();render();toast("예시 화면을 새로 그렸습니다")}else load()};
+$("#api").value=ls.get("api")||"";
+if(ls.get("token")&&ls.get("api"))load();
+if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
+</script>
