@@ -52,6 +52,7 @@ span.dchip{display:inline-block!important;padding:1px 8px;border-radius:6px;font
 .cal .d.nn{background:var(--bad-soft)}.cal .d.nn .n{color:var(--bad)}.cal .d.nn .ev.n{background:transparent;padding:0}.cal .d.m.nn{background:linear-gradient(135deg,var(--bad-soft) 50%,var(--warn-soft) 50%)}
 .cal .d.tod .n{background:var(--brand);color:#fff}
 .tag{display:inline-block;width:10px;height:10px;border-radius:3px;margin:6px 6px 0 0;flex:none}.tag.a{background:var(--lime-deep)}.tag.n{background:var(--bad)}.tag.m{background:#F0A040}
+.cal .wrow{border-top:1px solid var(--line);padding:3px 0 4px}.cal .g7{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cal .wrow .d{min-height:0!important;border:0;background:transparent;text-align:center;padding:3px 0;display:block!important;cursor:pointer}.cal .wrow .d .n{font-size:14px;display:inline-block;min-width:24px}.cal .bars{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 2px;margin-top:2px}.cal .bar{font-size:11.5px;font-weight:700;line-height:1.5;border-radius:5px;padding:0 4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cal .bar.m{background:var(--warn-soft);color:var(--warn)}.cal .bar.n{background:var(--bad-soft);color:var(--bad)}.cal .bar.a{background:var(--lime-soft);color:var(--ink)}.cal .g7 .d:first-child .n{color:var(--bad)}.cal .g7 .d.tod .n{color:#fff}
 .cal .lst{margin-top:8px}.wkg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}.wkg .wd{font-size:12px;color:var(--sub)}.wkg .wd:first-child{color:var(--bad)}.wkg .d{border:1px solid var(--line);border-radius:8px;padding:5px 0;font-weight:700;font-size:14.5px;background:var(--panel)}.wkg .d.m{background:var(--warn-soft);color:var(--warn)}.wkg .d.nn{background:var(--bad-soft);color:var(--bad)}.wkg .d.m.nn{background:linear-gradient(135deg,var(--bad-soft) 50%,var(--warn-soft) 50%)}.wkg .d.a{box-shadow:inset 0 -3px 0 var(--lime-deep)}.wkg .d.tod{background:var(--brand);color:#fff;border-color:var(--brand)}
 .wkl{margin-top:8px}.wkl .d2{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:14px;white-space:pre-line;align-items:flex-start}.wkl .d2:first-child{border-top:0}.wkl .dd{min-width:84px;font-weight:700;white-space:nowrap}
 .cal .lst .d2{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;white-space:pre-line}.cal .lst .d2:first-child{border-top:0}.cal .lst .dd{min-width:64px;font-weight:700;white-space:nowrap}
@@ -328,15 +329,22 @@ function renderCal(){
   const b=boot,t=new Date(b.today+"T00:00:00");if(!calYM)calYM=[t.getFullYear(),t.getMonth()];
   const [Y,M]=calYM,first=new Date(Y,M,1),start=new Date(Y,M,1-first.getDay()),ev=events();
   const key=d=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();const by={};ev.forEach(e=>{(by[key(e.d)]=by[key(e.d)]||[]).push(e)});
-  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),out=d.getMonth()!==M,tod=k===key(t);const es=by[k]||[];
-    cells+=`<div class="d${out?" out":""}${tod?" tod":""}${es.some(e=>e.kind==="m")?" m":""}${es.some(e=>e.kind==="n")?" nn":""}${es.some(e=>e.kind==="a")?" a":""}" data-k="${k}"><span class="n">${d.getDate()}</span>${es.slice(0,3).map(e=>`<span class="ev ${e.kind}">${esc(e.txt)}</span>`).join("")}</div>`;}
+  // 주(行) 단위: 날짜 칸 + 그 아래 이어지는 일정 막대(여러 날을 관통하며 문구 표시)
+  const last=new Date(Y,M+1,0),nW=Math.ceil((first.getDay()+last.getDate())/7);
+  const dayItems=d=>{const out=[];(by[key(d)]||[]).forEach(e=>{if(e.kind==="m")out.push({t:"월말진단",k:"m"});else if(e.kind==="n")String(e.full||"").replace(/ 내신$/,"").split("·").filter(Boolean).forEach(sc=>out.push({t:sc+" 내신",k:"n"}));else out.push({t:e.txt,k:"a"})});return out};
+  let cells="";for(let w=0;w<nW;w++){let g="";const runs=[];
+    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+w*7+i);const k=key(d),out=d.getMonth()!==M,tod=k===key(t);
+      g+=`<div class="d${out?" out":""}${tod?" tod":""}" data-k="${k}"><span class="n">${d.getDate()}</span></div>`;
+      dayItems(d).forEach(it=>{const r=runs.find(r=>r.t===it.t&&r.k===it.k&&r.e===i-1);if(r)r.e=i;else runs.push({t:it.t,k:it.k,s:i,e:i})});}
+    const lanes=[];runs.sort((p,q)=>p.s-q.s||(q.e-q.s)-(p.e-p.s)).forEach(r=>{let l=lanes.findIndex(x=>x<r.s);if(l<0){l=lanes.length;lanes.push(-1)}lanes[l]=r.e;r.l=l});
+    cells+=`<div class="wrow"><div class="g7">${g}</div>${runs.length?`<div class="bars">${runs.map(r=>`<div class="bar ${r.k}" style="grid-column:${r.s+1}/span ${r.e-r.s+1};grid-row:${r.l+1}">${esc(r.t)}</div>`).join("")}</div>`:""}</div>`;}
   const monthEv=[];ev.filter(e=>e.d.getMonth()===M&&e.d.getFullYear()===Y).forEach(e=>{if(e.kind==="n"){(e.first||[]).forEach(t=>monthEv.push({d:e.d,txt:t,kind:"n"}))}else monthEv.push({d:e.d,txt:e.full,kind:e.kind})});
   // 같은 내용·종류가 하루씩 이어지면 한 줄로 묶음
   const merged=[];monthEv.sort((a,b)=>a.d-b.d).forEach(e=>{const last=merged.find(m=>m.txt===e.txt&&m.kind===e.kind&&(e.d-m.end)===86400000);if(last)last.end=e.d;else merged.push({...e,end:e.d})});
   monthEv.length=0;merged.forEach(m=>monthEv.push(m));
   const sel=calSel?ev.filter(e=>key(e.d)===calSel):null;
   $("#cal").innerHTML=`<div class="calL"><div class="nav"><button id="calPrev">◀</button><b>${Y}년 ${M+1}월</b><button id="calNext">▶</button></div>
-  <div class="g">${"일월화수목금토".split("").map(w=>`<div class="wd">${w}</div>`).join("")}${cells}</div><div style="font-size:12.5px;color:var(--sub);margin-top:6px"><span class="tag m"></span>월말 진단 <span class="tag n"></span>내신(내 학생 학교) <span class="tag a"></span>학원 일정</div></div>
+  <div class="g">${"일월화수목금토".split("").map(w=>`<div class="wd">${w}</div>`).join("")}</div>${cells}<div style="font-size:12.5px;color:var(--sub);margin-top:6px"><span class="tag m"></span>월말 진단 <span class="tag n"></span>내신(내 학생 학교) <span class="tag a"></span>학원 일정</div></div>
   <div class="calR"><div class="lst">${sel&&sel.length?`<h3 style="margin:10px 0 4px">${esc(calSel.replace(/^\d+-/,"").replace("-","/"))}</h3>${sel.map(e=>`<div class="d2"><span class="tag ${e.kind}"></span><span>${esc(e.full||e.txt)}</span></div>`).join("")}<div style="height:8px"></div>`:""}${monthEv.length?monthEv.map(e=>`<div class="d2"><span class="dd">${e.d.getMonth()+1}/${e.d.getDate()}(${"일월화수목금토"[e.d.getDay()]})${e.end&&e.end-e.d?`~${e.end.getMonth()+1}/${e.end.getDate()}(${"일월화수목금토"[e.end.getDay()]})`:""}</span><span class="tag ${e.kind}"></span><span>${esc(e.txt)}</span></div>`).join(""):`<div class="empty">이 달 일정이 없습니다 (시트 '학사일정' 탭)</div>`}</div></div>`;
   renderWeek(ev,key,t);
   $("#calPrev").onclick=()=>{calYM=[M===0?Y-1:Y,(M+11)%12];calSel=null;renderCal()};$("#calNext").onclick=()=>{calYM=[M===11?Y+1:Y,(M+1)%12];calSel=null;renderCal()};
