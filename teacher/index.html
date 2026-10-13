@@ -138,9 +138,9 @@ h3{font-size:16px;margin:14px 0 6px;color:var(--ink);font-weight:700}
   <!-- 로그인 -->
   <div class="login card" id="login">
     <div style="text-align:center;margin-bottom:6px"><img src="logo-dark.png" alt="라임라잇수학학원" style="height:64px"></div><h2 style="text-align:center;font-size:22px">선생님 앱</h2>
-    <label for="api">앱 주소 (실장이 알려준 주소)</label><input id="api" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
     <label for="nm">이름</label><input id="nm" placeholder="예) 김은혜" autocomplete="username">
     <label for="pin">PIN 4자리</label><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <details style="margin-top:8px"><summary style="font-size:12.5px;color:var(--sub);cursor:pointer">연결 주소 (바꿀 일 없음)</summary><input id="api" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" style="margin-top:6px"></details>
     <div class="err" id="lerr" hidden></div>
     <div class="row" style="margin-top:14px;justify-content:space-between">
       <button id="demo">예시 화면 보기</button>
@@ -443,8 +443,8 @@ async function load(){
   catch(e){const c=ls.get("boot");if(c&&e.message!=="auth"){boot=JSON.parse(c);showApp();toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{ls.del("token");$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"";$("#lerr").hidden=!$("#lerr").textContent}}
 }
 $("#go").onclick=async()=>{
-  const base=$("#api").value.trim(),name=$("#nm").value.trim(),pin=$("#pin").value.trim();
-  if(!base||!name||!pin){$("#lerr").textContent="주소·이름·PIN을 모두 적어 주세요";$("#lerr").hidden=false;return}
+  const base=$("#api").value.trim()||API_DEFAULT,name=$("#nm").value.trim(),pin=$("#pin").value.trim();
+  if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
   ls.set("api",base);$("#go").disabled=true;
   try{const r=await api({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":"연결 실패");ls.set("token",r.token);demo=false;await load();}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"주소에 연결하지 못했습니다":e.message;$("#lerr").hidden=false}
@@ -453,7 +453,8 @@ $("#go").onclick=async()=>{
 $("#demo").onclick=()=>{demo=true;boot=demoData();showApp();};
 $("#logout").onclick=()=>{ls.del("token");ls.del("boot");demo=false;att={};notes={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;};
 $("#refresh").onclick=()=>{if(demo){boot=demoData();render();toast("예시 화면을 새로 그렸습니다")}else load()};
-$("#api").value=ls.get("api")||"";
+const API_DEFAULT="https://script.google.com/macros/s/AKfycbxW5BKDfh3tuWTYDIaZILVPCZwRA4Vbsk0i09XN6-eEpJgauQjHp_hn5AP7x_xM2_Ra/exec";
+$("#api").value=ls.get("api")||API_DEFAULT;
 if(ls.get("token")&&ls.get("api"))load();
 if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
 </script>
