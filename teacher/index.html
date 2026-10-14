@@ -380,15 +380,15 @@ function render(){
   const WD="월화수목금토일"; const ti=WD.indexOf(b.weekday); // 오늘 요일 번호 (일=6 → 주 전환 전, 아무것도 재촉 안 함)
   const dayOf=c=>/월|수/.test(c.day)?2:/화|목/.test(c.day)?3:(c.weekly&&WD.indexOf(c.weekly.day)>=0?WD.indexOf(c.weekly.day):5); // 단원·과제·문자 기한: 월수→수, 화목→목
   const mark=(ok,due)=>ok?{k:"ok",t:"완료"}:ti===6?{k:"wait",t:"미완료"}:ti>due?{k:"no",t:"미완료"}:ti===due?{k:"due",t:"미완료"}:{k:"wait",t:"미완료"};
-  const wkDetail=c=>{const w=c.weekly;if(!w)return[["주간 탭에 이 반 블록이 없음","miss"]];return[["이번 주 진도(단원)",w.unit],["이번 주 과제",w.hw],...(w.subBook?[["부교재 진도",w.subUnit],["부교재 과제",w.subHw]]:[])]};
+  const wkDetail=c=>{const w=c.weekly;if(!w)return[["주간 탭에 이 반 블록이 없음","miss"]];return[["이번 주 진도",w.unit],["이번 주 과제",w.hw],...(w.subBook?[["부교재 진도",w.subUnit],["부교재 과제",w.subHw]]:[])]};
   const todayT=[],weekT=[],monthT=[];
   const dueTxt=d=>"기한 "+WD[d];
   tc.forEach(c=>{const w=c.weekly;const m1=mark(done(c),ti),m2=mark(!!(w&&(w.unit||w.hw)),ti);
     todayT.push({cls:c.cls,sub:dayChip(c.day),cells:[{m:m1,t:c.cls+" 출석",rows:[["오늘 출석 저장",done(c)?"저장됨":""]],app:true,go:"오늘 탭에서 입력"},c.mk?{m:{k:"na",t:"—"},t:c.cls+" 진도·과제",rows:[["마스터클리닉은 진도·과제 입력 없음","miss"]]}:{m:m2,t:c.cls+" 진도·과제",rows:wkDetail(c),app:true,go:"오늘 탭에서 입력"}]});});
   b.classes.forEach(c=>{if(c.mk)return;const w=c.weekly,d=dayOf(c);
     const c1=w?{m:mark(!!(w.unit||w.hw),d),t:c.cls+" 단원·과제",rows:wkDetail(c),app:true,go:"수업 탭에서 입력",link:cellLink(LK.주간,w.row?"E"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 단원·과제",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
-    const c2=w?{m:mark(!!w.sent,d),t:c.cls+" 주간 문자 확인",rows:[["주간 문자 발송 확인(주간 탭 M)",w.sent]],note:"문자를 보낸 뒤 주간 탭 확인란에 표시하면 ✓로 바뀝니다",link:cellLink(LK.주간,w.row?"M"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 주간 문자 확인",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
-    const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위(반별 탭 K)",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"기한 수"};
+    const c2=w?{m:mark(!!w.sent,d),t:c.cls+" 주간 문자 확인",rows:[["주간 문자 발송",w.sent]],note:"문자를 보낸 뒤 주간 탭 확인란에 표시하면 ✓로 바뀝니다",link:cellLink(LK.주간,w.row?"M"+w.row:""),due:dueTxt(d)}:{m:{k:"na",t:"블록 없음"},t:c.cls+" 주간 문자 확인",rows:[["주간 탭에 이 반 블록이 없음","miss"]]};
+    const c3={m:mark(!!c.weekRange,2),t:c.cls+" 주간진단 범위",rows:[["주간진단 범위",c.weekRange]],note:"반별 탭 K열에 범위를 적으면 ✓로 바뀝니다",link:cellLink(LK.반별||c.link,c.row?"K"+c.row:""),due:"기한 수"};
     weekT.push({cls:c.cls,sub:dayChip(c.day)+" "+dueTxt(d),cells:[c1,c2,c3]});});
   b.todo.forEach(t=>{if(t.kind==="월간")monthT.push({t:t.text,rows:[["학사일정",t.text]],link:t.link})});
   const absL=abs.map(t=>({t,link:L.결석보강})),mkL=mk.map(t=>({t,link:L.결석보강}));
