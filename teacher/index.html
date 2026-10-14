@@ -462,7 +462,7 @@ function preOf(c,s){const st=boot.students[s.name]||{};const dsel=attMD();
   if(st.todayAbsence&&dsel===md(boot.today.slice(5).replace("-","/")))return st.todayAbsence;
   return(st.upcomingAbsence||[]).some(d=>md(d)===dsel)?{type:"결석 예정",note:""}:null}
 function curOf(c,s){const k=c.cls+"|"+s.name;const saved=boot.attendance||{};const mk=c.mk&&s.att?String(s.att[attMD()]||"").trim():"";
-  return att[k]||(saved[k]||{}).status||(mk==="출"?"출석":preOf(c,s)?"결석":"출석")}
+  return att[k]||(saved[k]||{}).status||(mk==="출"?"출석":preOf(c,s)?"결석":"")} // 10/14 킴쌤: 기본값 출석 없음 — 결석이 확실한 것만 미리 결석, 나머지는 선생님이 직접 확인해 누름
 function renderAtt(){
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c){$("#attList").innerHTML="";return}
   const saved=boot.attendance;
@@ -475,7 +475,7 @@ function renderAtt(){
   document.querySelectorAll("#attList .seg button").forEach(bt=>bt.onclick=()=>{att[bt.dataset.k]=bt.dataset.v;renderAtt()});
   document.querySelectorAll("#attList [data-note]").forEach(i=>i.oninput=()=>notes[i.dataset.note]=i.value);
   const vals=c.students.map(s=>curOf(c,s));
-  $("#attSum").textContent=`${c.students.length}명 · 결석 ${vals.filter(v=>v==="결석").length}`;
+  const left=vals.filter(v=>!v).length;$("#attSum").textContent=`${c.students.length}명 · 출석 ${vals.filter(v=>v==="출석").length} · 결석 ${vals.filter(v=>v==="결석").length}`+(left?` · 안 누름 ${left}`:"");
   const mb=(c.weekly&&c.weekly.mainBook)||c.book||"주교재", sb=(c.weekly&&c.weekly.subBook)||c.sub||"";
   $("#attTitle").textContent=c.cls;$("#bookMain").textContent="주교재 · "+mb;$("#bookSub").textContent="부교재 · "+sb;$("#subBk").hidden=!sb||!!c.mk;$("#mainBk").hidden=!!c.mk;
   ["unit","hw","subUnit","subHw"].forEach(id=>$("#"+id).value=notes[id+"|"+c.cls]||"");
@@ -529,6 +529,7 @@ function normalize(t){
 $("#attSave").onclick=async()=>{
   const c=boot.classes.find(x=>x.cls===$("#attClass").value); if(!c)return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test($("#attDate").value)){toast("날짜를 먼저 골라 주세요");return}
+  {const left=c.students.filter(s=>!curOf(c,s));if(left.length){toast(`출석·결석을 아직 안 누른 학생이 있어요: ${left.slice(0,3).map(s=>s.name).join(", ")}${left.length>3?" 외 "+(left.length-3)+"명":""}`);return}}
   const items=c.students.map(s=>({name:s.name,status:curOf(c,s),note:notes[c.cls+"|"+s.name]||"",makeup:!!s.makeup,mkRow:s.mkRow||0}));
   const weekly=c.mk?null:{unit:$("#unit").value.trim(),hw:$("#hw").value.trim(),subUnit:$("#subUnit").value.trim(),subHw:$("#subHw").value.trim()};
   const body={a:"attendance",t:ls.get("token")||"",date:$("#attDate").value,cls:c.cls,progress:weekly?weekly.unit:"",items,weekly,mk:c.mk||null};

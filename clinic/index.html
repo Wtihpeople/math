@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>라임라잇 마클</title>
+<meta name="theme-color" content="#2eaf64">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="라임라잇 마클">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../teacher/icon-192.png">
+<style>
+@font-face{font-family:"Pretendard";font-weight:400;font-display:swap;src:url("../teacher/fonts/Pretendard-Regular.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:600;font-display:swap;src:url("../teacher/fonts/Pretendard-SemiBold.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:700;font-display:swap;src:url("../teacher/fonts/Pretendard-Bold.woff2") format("woff2")}
+/* 조교용 마스터클리닉 앱: 폰 한 손 사용. 위 = 요일·시간 선택(고정), 아래 = 교실 카드(학생 출·결). 탭 2개: 마클 · 공지·일정 */
+:root{
+  --bg:#f5f7f6; --panel:#ffffff; --ink:#1e2a38; --sub:#6b7480; --line:#e4e8e5; --soft:#eef4f0;
+  --brand:#2eaf64; --brand-deep:#249a56; --brand-soft:#e4f5ea;
+  --bad:#c62828; --bad-soft:#fdecea; --warn:#8a5300; --warn-soft:#fff3d6; --info:#2f5f9e; --info-soft:#e7eef8;
+  --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light; box-sizing:border-box;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%} [hidden]{display:none!important}
+body{display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+#scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px}
+button.primary{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:2px solid var(--brand-deep);outline-offset:2px}
+input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel);width:100%}
+.top{position:sticky;top:0;z-index:6;background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.top .logo{height:34px;width:auto}
+.top .me{font-weight:700;font-size:15px;white-space:nowrap}
+.top .tday{font-size:14px;font-weight:800;background:#fff;color:var(--brand);border-radius:6px;padding:2px 9px;white-space:nowrap}
+.top #logout{margin-left:auto;background:transparent;color:#fff;border-color:rgba(255,255,255,.6);padding:5px 12px;font-size:14px;white-space:nowrap}
+.wrap{max-width:820px;margin:0 auto;padding:12px 16px 24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+h3{margin:0 0 8px;font-size:17px}
+/* 고정 선택줄 */
+.pick{position:sticky;top:var(--toph,54px);z-index:4;background:var(--bg);padding:10px 0 8px;display:grid;gap:8px}
+.seg2{display:flex;gap:6px}
+.seg2 button{flex:1 1 0;font-weight:700;font-size:16px;padding:10px 4px;border-radius:12px}
+.seg2 button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.slots button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand)}
+.slots button small{display:block;font-weight:600;font-size:13px;opacity:.85}
+/* 교실 카드 */
+.room{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.room .hd{background:var(--ink);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.room .hd b{font-size:19px}
+.room .hd span{font-size:15px;opacity:.9}
+.room .hd .cnt{margin-left:auto;font-weight:700;font-size:15px;white-space:nowrap}
+.room.done .hd{background:var(--brand)}
+.st{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:11px 14px;border-top:1px solid var(--line)}
+.st:first-of-type{border-top:0}
+.st .nm b{font-size:17px}
+.st .nm .mk{display:inline-block;margin-left:6px;font-size:13px;font-weight:700;background:var(--info-soft);color:var(--info);border-radius:6px;padding:0 7px;vertical-align:2px}
+.st .meta{font-size:15px;color:var(--sub)}
+.st .meta b{color:var(--ink);font-weight:600}
+.st .memo{grid-column:1/-1;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:6px 10px;font-size:15px}
+.st .memo + .memo{margin-top:-2px}
+.ab{display:flex;gap:6px}
+.ab button{min-width:58px;font-weight:700;font-size:16px;padding:9px 0;border-radius:10px}
+.ab button.o[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.ab button.x[aria-pressed="true"]{background:var(--bad);color:#fff;border-color:var(--bad)}
+.ab .other{font-weight:700;font-size:15px;color:var(--info);background:var(--info-soft);border-radius:8px;padding:8px 10px;white-space:nowrap}
+.room .ft{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:var(--soft)}
+.room .ft .sum{font-size:15px;color:var(--sub)}
+.room .ft button{margin-left:auto;padding:10px 22px;font-size:16px}
+.empty{color:var(--sub);text-align:center;padding:18px 0}
+.warnbar{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:8px 12px;font-weight:600;margin-top:10px}
+/* 공지·일정 */
+.list .it{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px;white-space:pre-line}
+.list .it:first-child{border-top:0}
+.list .it .d{min-width:74px;font-weight:700;white-space:nowrap}
+.list .it.off .d,.list .it.off .t{color:var(--bad)}
+/* 하단 탭 */
+.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{border:0;border-radius:0;background:transparent;padding:12px 0;font-weight:700;font-size:16px;color:var(--sub)}
+.tabs button[aria-selected="true"]{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
+/* 로그인 */
+.login{max-width:420px;margin:40px auto}
+.login label{display:block;font-size:14px;color:var(--sub);margin-top:10px}
+.login .err{color:var(--bad);margin-top:8px}
+.howto{margin-top:16px;background:var(--soft);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+.howto .os{display:inline-block;min-width:64px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-weight:600;opacity:0;transition:.2s;z-index:20;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+@media (min-width:900px){.tabs{display:none}.screen{display:block!important}.both{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.both .side{position:sticky;top:calc(var(--toph,54px) + 10px)}}
+</style>
+
+<div id="scroll">
+<div class="top" id="top" hidden>
+  <img class="logo" src="../teacher/logo.png" alt="라임라잇수학학원" onerror="this.hidden=true">
+  <span class="me" id="meName"></span><span class="tday" id="tday"></span>
+  <button id="logout">로그아웃</button>
+</div>
+
+<div class="wrap">
+  <div class="login card" id="login">
+    <div style="text-align:center;margin-bottom:6px"><img src="../teacher/logo-dark.png" alt="라임라잇수학학원" style="height:64px"></div>
+    <h2 style="text-align:center;font-size:22px;margin:4px 0 8px">마스터클리닉</h2>
+    <label for="nm">이름</label><input id="nm" placeholder="예) 오유민" autocomplete="username">
+    <label for="pin">PIN 4자리</label><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <div class="err" id="lerr" hidden></div>
+    <button class="primary" id="go" style="width:100%;margin-top:14px;padding:12px">들어가기</button>
+    <div class="howto"><b>폰 홈 화면에 앱처럼 넣기</b><div><span class="os">아이폰</span>사파리 아래 <b>공유</b> → <b>홈 화면에 추가</b></div><div><span class="os">안드로이드</span>크롬 오른쪽 위 <b>⋮</b> → <b>홈 화면에 추가</b></div></div>
+  </div>
+
+  <div id="app" hidden>
+    <div class="both">
+      <section class="screen" data-tab="mk">
+        <div class="pick" id="pick">
+          <div class="seg2" id="dayPick"></div>
+          <div class="seg2 slots" id="slotPick"></div>
+        </div>
+        <div id="rooms"></div>
+      </section>
+      <section class="screen side" data-tab="info">
+        <div class="card"><h3>공지</h3><div class="list" id="notices"></div></div>
+        <div class="card" style="margin-top:12px"><h3 id="schTitle">학사일정</h3><div class="list" id="sched"></div></div>
+      </section>
+    </div>
+  </div>
+</div>
+</div>
+<nav class="tabs" id="tabs" hidden><button data-go="mk" aria-selected="true">마클</button><button data-go="info">공지·일정</button></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get:k=>{try{return localStorage.getItem("mk_"+k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem("mk_"+k,v)}catch(e){}},del:k=>{try{localStorage.removeItem("mk_"+k)}catch(e){}}};
+const API="https://script.google.com/macros/s/AKfycbxW5BKDfh3tuWTYDIaZILVPCZwRA4Vbsk0i09XN6-eEpJgauQjHp_hn5AP7x_xM2_Ra/exec";
+async function post(body){const r=await fetch(API,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return r.json();}
+function toast(m,ms){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),ms||2600);}
+function setTopH(){const t=$("#top");if(t&&!t.hidden)document.documentElement.style.setProperty("--toph",t.offsetHeight+"px")}
+addEventListener("resize",setTopH);
+
+let D=null, sel={day:"",slot:""}, picks={}; // picks[slot|mkRow] = "출석"|"결석"
+const TITLE={"금3":"3시","금6":"6시","토10":"10시","토2":"2시","토5":"5시"};
+const TIME={"금3":"3시~6시","금6":"6시~9시","토10":"10시~1시","토2":"2시~5시","토5":"5시~8시"};
+
+function defaultPick(){
+  const now=new Date(),wd=now.getDay(),h=now.getHours();
+  if(wd===6)return{day:"토",slot:h<13?"토10":h<17?"토2":"토5"};
+  if(wd===5)return{day:"금",slot:h<18?"금3":"금6"};
+  return{day:"금",slot:"금3"};
+}
+function go(tab){document.querySelectorAll(".screen").forEach(s=>s.hidden=s.dataset.tab!==tab);document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===tab));$("#scroll").scrollTo({top:0});}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+function render(){
+  const b=D; $("#meName").textContent=b.me.name+" 선생님";
+  const t=new Date(b.today+"T00:00:00"); $("#tday").textContent=(t.getMonth()+1)+"/"+t.getDate()+"("+b.weekday+")";
+  const days=[["금",b.days.금.md],["토",b.days.토.md]];
+  $("#dayPick").innerHTML=days.map(([d,md])=>`<button data-d="${d}" aria-pressed="${sel.day===d}">${d}요일 ${md}</button>`).join("");
+  const slots=b.slots.filter(s=>s.day===sel.day);
+  if(!slots.some(s=>s.code===sel.slot))sel.slot=slots[0].code;
+  $("#slotPick").innerHTML=slots.map(s=>{const n=s.rooms.reduce((a,r)=>a+r.students.length,0);return`<button data-s="${s.code}" aria-pressed="${sel.slot===s.code}">${TITLE[s.code]}<small>${n}명</small></button>`}).join("");
+  document.querySelectorAll("#dayPick button").forEach(x=>x.onclick=()=>{sel.day=x.dataset.d;sel.slot="";render()});
+  document.querySelectorAll("#slotPick button").forEach(x=>x.onclick=()=>{sel.slot=x.dataset.s;render()});
+  renderRooms(); renderInfo(); setTopH();
+}
+const curOf=(slot,s)=>picks[slot+"|"+s.mkRow]||(s.att==="출"?"출석":s.att==="결"?"결석":"");
+const otherOf=s=>s.att&&s.att!=="출"&&s.att!=="결"?s.att:""; // '토10'(이동)·'보강완료' 같은 사람 표기 → 앱에서 덮어쓰지 않음
+function renderRooms(){
+  const S=D.slots.find(s=>s.code===sel.slot); const host=$("#rooms");
+  if(!S||!S.rooms.length){host.innerHTML=`<div class="empty">이 시간 마클 학생이 없습니다</div>`;return}
+  host.innerHTML=(S.hasCol?"":`<div class="warnbar">마클 시트 3행에 ${esc(S.md)} 날짜 칸이 없어 제출할 수 없습니다. 데스크에 알려 주세요.</div>`)+S.rooms.map((r,ri)=>{
+    const vals=r.students.map(s=>otherOf(s)?"기타":curOf(S.code,s));
+    const o=vals.filter(v=>v==="출석").length,x=vals.filter(v=>v==="결석").length,left=vals.filter(v=>!v).length;
+    const saved=r.students.every(s=>s.att);
+    return `<div class="room${saved&&!r.students.some(s=>picks[S.code+"|"+s.mkRow]&&picks[S.code+"|"+s.mkRow]!==(s.att==="출"?"출석":s.att==="결"?"결석":""))?" done":""}">
+      <div class="hd"><b>${esc(r.fl)} ${esc(r.rm)}</b><span>${esc(r.teacher||"")}${r.teacher?" 선생님":""}</span><span class="cnt">${r.students.length}명</span></div>
+      ${r.students.map(s=>{const cur=curOf(S.code,s),oth=otherOf(s);
+        return `<div class="st"><div class="nm"><b>${esc(s.name)}</b>${s.makeup?`<span class="mk">보강</span>`:""}
+          <div class="meta">${esc(s.cls||"")}${s.range?` · 진단 <b>${esc(s.range)}</b>`:""}</div></div>
+          <div class="ab">${oth?`<span class="other">${esc(oth)}</span>`:`<button class="o" data-k="${S.code}|${s.mkRow}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="x" data-k="${S.code}|${s.mkRow}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button>`}</div>
+          ${s.note?`<div class="memo">${esc(s.note)}</div>`:""}${s.req?`<div class="memo">${esc(s.req)}</div>`:""}</div>`}).join("")}
+      <div class="ft"><span class="sum">출석 ${o} · 결석 ${x}${left?` · 안 누름 ${left}`:""}</span><button class="primary" data-sub="${ri}" ${S.hasCol?"":"disabled"}>제출</button></div></div>`}).join("");
+  host.querySelectorAll(".ab button").forEach(bt=>bt.onclick=()=>{picks[bt.dataset.k]=bt.dataset.v;renderRooms()});
+  host.querySelectorAll("[data-sub]").forEach(bt=>bt.onclick=()=>submit(S,S.rooms[+bt.dataset.sub],bt));
+}
+async function submit(S,r,bt){
+  const live=r.students.filter(s=>!otherOf(s));
+  const left=live.filter(s=>!curOf(S.code,s));
+  if(left.length){toast("출석·결석을 아직 안 누른 학생: "+left.slice(0,3).map(s=>s.name).join(", ")+(left.length>3?" 외 "+(left.length-3)+"명":""));return}
+  const items=live.map(s=>({name:s.name,status:curOf(S.code,s),note:"",makeup:!!s.makeup,mkRow:s.mkRow}));
+  bt.disabled=true;bt.textContent="저장 중…";
+  try{
+    const res=await post({a:"attendance",t:ls.get("token")||"",date:S.ymd,cls:"마클 "+S.code+" "+r.fl+" "+r.rm,items,weekly:null,mk:{code:S.code},clinicOnly:true});
+    if(!res.ok)throw new Error(res.error||"fail");
+    items.forEach(i=>{const s=r.students.find(x=>x.mkRow===i.mkRow);if(s)s.att=i.status==="결석"?"결":"출";delete picks[S.code+"|"+i.mkRow]});
+    const kept=res.mk&&res.mk.kept&&res.mk.kept.length?" · 그대로 둔 칸 "+res.mk.kept.length:"";
+    toast(`${r.fl} ${r.rm} 제출했습니다 · 출석 ${items.filter(i=>i.status==="출석").length} · 결석 ${items.filter(i=>i.status==="결석").length}${kept}`);
+    renderRooms();
+  }catch(e){if(e.message==="auth"){logout("다시 로그인해 주세요")}else toast("저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요");bt.disabled=false;bt.textContent="제출"}
+}
+function renderInfo(){
+  const N=D.notices||[]; $("#notices").innerHTML=N.length?N.map(n=>`<div class="it"><span class="d">${esc(n.date)}</span><span class="t">${esc(n.text)}</span></div>`).join(""):`<div class="empty">공지가 없습니다</div>`;
+  const t=new Date(D.today+"T00:00:00"),M=t.getMonth()+1; $("#schTitle").textContent=M+"월 학사일정";
+  const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?[+m[1],+m[2]]:null};
+  const rows=(D.schedule||[]).map(x=>({x,d:md(x.date)})).filter(o=>o.d&&o.d[0]===M).sort((a,b)=>a.d[1]-b.d[1]);
+  $("#sched").innerHTML=rows.length?rows.map(({x})=>{const off=/휴|공휴|쉼|휴강|휴원/.test((x.kind||"")+(x.text||""));return`<div class="it${off?" off":""}"><span class="d">${esc(x.date)}</span><span class="t">${esc((x.kind?x.kind+" · ":"")+x.text)}</span></div>`}).join(""):`<div class="empty">이번 달 일정이 없습니다</div>`;
+}
+
+function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;if(!sel.day)sel=defaultPick();render();go(innerWidth>=900?"mk":(ls.get("tab")||"mk"));}
+function logout(msg){ls.del("token");ls.del("data");D=null;picks={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=msg||"";$("#lerr").hidden=!msg;}
+$("#logout").onclick=()=>logout("");
+async function load(fresh){
+  const c=ls.get("data"); if(c&&!D){try{D=JSON.parse(c);showApp()}catch(e){}}
+  try{const r=await post({a:"clinic",t:ls.get("token")||"",fresh:fresh?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");D=r;ls.set("data",JSON.stringify(r));showApp();}
+  catch(e){if(e.message==="auth")logout("다시 로그인해 주세요");else if(D)toast("연결이 안 돼 저장된 화면을 보여줍니다");else logout("연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요")}
+}
+$("#go").onclick=async()=>{
+  const name=$("#nm").value.trim(),pin=$("#pin").value.trim();
+  if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
+  $("#go").disabled=true;$("#go").textContent="확인 중…";
+  try{const r=await post({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);await load(true);}
+  catch(e){$("#lerr").textContent=e.message.includes("fetch")?"연결하지 못했습니다":e.message;$("#lerr").hidden=false}
+  finally{$("#go").disabled=false;$("#go").textContent="들어가기"}
+};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&ls.get("token")&&D)load(true)});
+if(ls.get("token"))load(true);
+if("serviceWorker" in navigator){try{const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.register("sw.js").then(r=>{try{r.update()}catch(e){}}).catch(()=>{});let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(done||!had)return;done=true;location.reload()})}catch(e){}}
+</script>
