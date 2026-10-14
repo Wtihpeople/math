@@ -399,8 +399,8 @@ function render(){
   $("#todoHint").textContent=lists.todo.length?lists.todo[0].t.replace(/^[^·]+· /,"")+(lists.todo.length>1?" 외 "+(lists.todo.length-1):""):"";
   document.querySelectorAll("#badges button").forEach(x=>x.classList.toggle("hot",x.dataset.p==="todo"&&lists.todo.length>0));
   const detail=x=>{const rows=(x.rows||[]).map(([k,v])=>v==="miss"?`<div class="miss">${esc(k)}</div>`:`<div>${esc(k)}: ${v?`<span class="okv">${esc(v)}</span>`:`<span class="miss">미입력</span>`}</div>`).join("");
-    const act=(x.app?`<button class="primary" data-att="${esc(x.cls||"")}">${esc(x.go||"입력하러 가기")}</button>`:"")+(x.note?`<span style="color:var(--sub);font-size:13px">${esc(x.note)}</span>`:"")+(x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">시트에서 보기 ↗</a>`:"");
-    return `<b>${esc(x.t)}</b>${x.due?` <small style="color:var(--sub)">· ${esc(x.due)}</small>`:""}<div style="margin-top:4px">${rows}</div>${act?`<div class="act">${act}</div>`:""}`};
+    const act=(x.app?`<button class="primary" data-att="${esc(x.cls||"")}">${esc(x.go||"입력하러 가기")}</button>`:"")+(x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">시트에서 보기 ↗</a>`:"");
+    return `<b>${esc(x.t)}</b><div style="margin-top:4px">${rows}</div>${act?`<div class="act">${act}</div>`:""}`};
   const table=(rows,heads,empty)=>rows.length?`<table class="tb"><thead><tr><th>반</th>${heads.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r,i)=>`<tr><td class="cls-n"><b>${esc(r.cls)}</b><small>${r.sub}</small></td>${r.cells.map((x,j)=>`<td class="c" data-r="${i}" data-j="${j}"><span class="m ${x.m.k}">${x.m.t}</span></td>`).join("")}</tr><tr class="dt" hidden data-dt="${i}"><td colspan="${heads.length+1}"></td></tr>`).join("")}</tbody></table>`:`<div class="empty">${empty}</div>`;
   $("#todoToday").innerHTML=table(todayT,["출석","진도·과제"],"오늘 수업이 없습니다");
   $("#todoWeek").innerHTML=table(weekT,["단원·과제","문자 확인","진단 범위"],"담당 반이 없습니다");
@@ -409,7 +409,7 @@ function render(){
   wire($("#todoToday"),todayT);wire($("#todoWeek"),weekT);
   const isDone=x=>!!x.ok;
   const li=(arr,cls,empty)=>arr.length?arr.map(x=>`<li class="${cls}">☐<span class="tt" style="flex:1">${esc(x.t)}</span>${x.link?`<a class="lk" href="${esc(x.link)}" target="_blank" rel="noopener">시트 ↗</a>`:""}</li>`).join(""):`<li class="empty">${empty}</li>`;
-  $("#todoMonth").innerHTML=li(monthT,"week","이번 달 월간 업무 없음 (학사일정 탭 종류 '월간')");
+  $("#todoMonth").innerHTML=li(monthT,"week","이번 달 월간 업무 없음");
   $("#todoN").hidden=!pT.length;$("#todoN").textContent=pT.length;
   $("#notices").innerHTML=b.notices.length?b.notices.map(n=>`<li class="notice"><span class="dt">${esc(n.date)}</span><span class="tx">${esc(n.text)}</span></li>`).join(""):`<li class="empty">공지 없음</li>`;
   document.querySelectorAll("#notices .notice").forEach(x=>x.onclick=()=>x.classList.toggle("open"));
