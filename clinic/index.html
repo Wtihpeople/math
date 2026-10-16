@@ -118,6 +118,10 @@ h3{margin:0 0 8px;font-size:17px}
 .duty .go{width:100%;margin-top:12px;padding:12px;font-size:16px;font-weight:700;border-color:var(--brand);color:var(--brand-deep)}
 .duty .sub3{font-weight:700;font-size:14px;color:var(--sub);margin:14px 0 2px}
 .lv{margin-top:6px}.lv .two{margin-top:14px}
+.duty .row.past{opacity:.45}
+.duty .pastbtn{width:100%;margin:4px 0 2px;padding:7px;font-size:14px;color:var(--sub);background:var(--soft)}
+.duty .row.now .d{color:var(--brand-deep)}
+.duty .row .d.dw{min-width:34px;font-size:17px}
 .duty .row .x{padding:6px 10px;font-size:13px}
 .calhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .calhd h3{margin:0;font-size:19px;text-align:center;flex:1}
@@ -174,7 +178,7 @@ h3{margin:0 0 8px;font-size:17px}
       <section class="screen side duty" data-tab="info">
         <div class="card"><h3>공지</h3><div class="list" id="notices"></div></div>
         <div class="card" style="margin-top:12px"><div class="calhd"><button id="calPrev" aria-label="이전 달">‹</button><h3 id="schTitle">학사일정</h3><button id="calNext" aria-label="다음 달">›</button></div><div id="cal"></div><div class="list" id="sched"></div></div>
-        <div class="card" style="margin-top:12px"><h3>이번 주 내 근무<small id="wkRange"></small></h3><div id="myWeek"></div>
+        <div class="card" style="margin-top:12px"><h3>내 근무</h3><div class="sub3" style="margin-top:4px">요일별 고정 근무</div><div id="myBase"></div><div class="sub3" id="monTitle">이번 달 근무 상세</div><div id="myWeek"></div>
           <div id="myLeavesWrap"><div class="sub3">내 휴무 신청</div><div id="myLeaves"></div></div>
           <button class="go lvOpen" id="lvOpen">휴무 신청</button>
           <div class="lv" id="lvForm" hidden>
@@ -282,15 +286,28 @@ async function submit(S,r,bt){
 // 매뉴얼: clinic/manual/ 폴더 그림 파일(킴쌤 제작). 순서대로 파일 이름만 적으면 됨
 const MANUAL=[];
 // 근무 탭 (조교근무 탭 ← API duty)
-let lvPick="", calIdx=0;
+let lvPick="", calIdx=0, showPast=false;
 const chipOf=(st,sub)=>st==="대체 완료"?`<span class="chip sub">대체 완료 · ${esc(sub||"")}</span>`:st==="대체 미정"?`<span class="chip wait">휴무 · 대체 미정</span>`:`<span class="chip">근무</span>`;
 function renderDuty(){
   const g=D.duty;
   if(!g){$("#myWeek").innerHTML=`<div class="empty">${g===undefined?"근무표 불러오는 중…":"근무표를 불러오지 못했습니다"}</div>`;$("#myLeavesWrap").hidden=true;return}
-  const W=g.week||[];
-  $("#wkRange").textContent=W.length?`${W[0].date.split(" ")[0]} ~ ${W[W.length-1].date.split(" ")[0]}`:"";
-  $("#myWeek").innerHTML=W.length?W.map(w=>`<div class="row"><span class="d">${esc(w.date)}</span><span class="tm">${esc(w.from)}~${esc(w.to)}${w.memo?`<small>${esc(w.memo)}</small>`:""}</span>${chipOf(w.status,w.sub)}</div>`).join(""):`<div class="empty">등록된 기본 근무가 없습니다<br>데스크에 근무 요일·시간을 알려 주세요</div>`;
-  const L=g.leaves||[];
+  const B=g.base||[], DOW="일월화수목금토", ORD="월화수목금토일", pad=t=>String(t||"").padStart(5,"0");
+  const t0=new Date(D.today+"T00:00:00"), Y=t0.getFullYear(), Mo=t0.getMonth();
+  // ① 요일별 고정 근무
+  const byDow=ORD.split("").map(d=>[d,B.filter(b=>b.dow===d).sort((a,b)=>pad(a.from)<pad(b.from)?-1:1)]).filter(x=>x[1].length);
+  $("#myBase").innerHTML=byDow.length?byDow.map(([d,list])=>`<div class="row"><span class="d dw">${d}</span><span class="tm">${list.map(b=>esc(b.from)+"~"+esc(b.to)+(b.memo?` <small style="display:inline">${esc(b.memo)}</small>`:"")).join("<br>")}</span></div>`).join(""):`<div class="empty">등록된 기본 근무가 없습니다<br>데스크에 근무 요일·시간을 알려 주세요</div>`;
+  // ② 이번 달 근무 상세 (기본 근무 × 이번 달 날짜, 휴무 신청 반영)
+  $("#monTitle").textContent=(Mo+1)+"월 근무 상세"; $("#monTitle").hidden=!B.length;
+  const Lall=g.leaves||[], rows=[], last=new Date(Y,Mo+1,0).getDate();
+  for(let d=1;d<=last;d++){const dt=new Date(Y,Mo,d),dw=DOW[dt.getDay()],ymd=Y+"-"+String(Mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    B.filter(b=>b.dow===dw).sort((a,b)=>pad(a.from)<pad(b.from)?-1:1).forEach(b=>{
+      const l=Lall.find(l=>l.ymd===ymd&&(!l.from||pad(l.from)<pad(b.to))&&(!l.to||pad(l.to)>pad(b.from)));
+      rows.push({ymd,label:(Mo+1)+"/"+d+" ("+dw+")",b,st:l?l.status:"근무",sub:l?l.sub:"",past:ymd<D.today,today:ymd===D.today});});}
+  const rowH=r=>`<div class="row${r.past?" past":""}${r.today?" now":""}"><span class="d">${r.label}</span><span class="tm">${esc(r.b.from)}~${esc(r.b.to)}</span>${chipOf(r.st,r.sub)}</div>`;
+  const P=rows.filter(r=>r.past), F=rows.filter(r=>!r.past);
+  $("#myWeek").innerHTML=(P.length?`<button class="pastbtn" id="pastBtn">${showPast?"지난 근무 접기":"지난 근무 "+P.length+"건 보기"}</button>`+(showPast?P.map(rowH).join(""):""):"")+F.map(rowH).join("")+(B.length&&!F.length?`<div class="empty">이번 달 남은 근무가 없습니다</div>`:"");
+  if($("#pastBtn"))$("#pastBtn").onclick=()=>{showPast=!showPast;renderDuty()};
+  const L=Lall.filter(l=>l.ymd>=D.today);
   $("#myLeavesWrap").hidden=!L.length;
   $("#myLeaves").innerHTML=L.length?L.map(l=>`<div class="row"><span class="d">${esc(l.date)}</span><span class="tm">${l.from?esc(l.from)+"~"+esc(l.to||""):"하루 전체"}${l.room?`<small>${esc(l.room)}</small>`:""}</span>${chipOf(l.status,l.sub)}${l.sub?"":`<button class="x" data-cancel="${l.row}">취소</button>`}</div>`).join(""):`<div class="empty">신청한 휴무가 없습니다</div>`;
   $("#myLeaves").querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancelLeave(+b.dataset.cancel,b));
