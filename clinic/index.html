@@ -79,7 +79,7 @@ h3{margin:0 0 8px;font-size:17px}
 .list .it .d{min-width:74px;font-weight:700;white-space:nowrap}
 .list .it.off .d,.list .it.off .t{color:var(--bad)}
 /* 하단 탭 */
-.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{border:0;border-radius:0;background:transparent;padding:12px 0;font-weight:700;font-size:16px;color:var(--sub)}
 .tabs button[aria-selected="true"]{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
 /* 로그인 */
@@ -91,7 +91,8 @@ h3{margin:0 0 8px;font-size:17px}
 .toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-weight:600;opacity:0;transition:.2s;z-index:20;max-width:92vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
-@media (min-width:900px){.tabs{display:none}.screen{display:block!important}.both{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.both .side{position:sticky;top:calc(var(--toph,54px) + 10px)}}
+@media (min-width:900px){.tabs{display:none}.screen{display:block!important}.both{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.both .side{position:sticky;top:calc(var(--toph,54px) + 10px)}.both .man{grid-column:1/-1}}
+.man img{display:block;width:100%;height:auto;border-radius:12px;margin-bottom:12px;background:#fff}
 </style>
 
 <div id="scroll">
@@ -126,11 +127,12 @@ h3{margin:0 0 8px;font-size:17px}
         <div class="card"><h3>공지</h3><div class="list" id="notices"></div></div>
         <div class="card" style="margin-top:12px"><h3 id="schTitle">학사일정</h3><div class="list" id="sched"></div></div>
       </section>
+      <section class="screen man" data-tab="man" hidden><div id="manual"></div></section>
     </div>
   </div>
 </div>
 </div>
-<nav class="tabs" id="tabs" hidden><button data-go="mk" aria-selected="true">마클</button><button data-go="info">공지·일정</button></nav>
+<nav class="tabs" id="tabs" hidden><button data-go="info">공지</button><button data-go="man">매뉴얼</button><button data-go="mk" aria-selected="true">출석</button></nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -219,7 +221,10 @@ async function submit(S,r,bt){
     renderRooms();
   }catch(e){if(e.message==="auth"){logout("다시 로그인해 주세요")}else toast("저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요");bt.disabled=false;bt.textContent="제출"}
 }
-function renderInfo(){
+// 매뉴얼: clinic/manual/ 폴더 그림 파일(킴쌤 제작). 순서대로 파일 이름만 적으면 됨
+const MANUAL=[];
+function renderManual(){$("#manual").innerHTML=MANUAL.length?MANUAL.map((f,i)=>`<img src="manual/${f}" alt="매뉴얼 ${i+1}" loading="lazy">`).join(""):`<div class="card"><div class="empty">매뉴얼 준비 중입니다</div></div>`;}
+function renderInfo(){renderManual();
   const N=D.notices||[]; $("#notices").innerHTML=N.length?N.map(n=>`<div class="it"><span class="d">${esc(n.date)}</span><span class="t">${esc(n.text)}</span></div>`).join(""):`<div class="empty">공지가 없습니다</div>`;
   const t=new Date(D.today+"T00:00:00"),M=t.getMonth()+1; $("#schTitle").textContent=M+"월 학사일정";
   const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?[+m[1],+m[2]]:null};
