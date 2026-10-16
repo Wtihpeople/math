@@ -110,6 +110,24 @@ h3{margin:0 0 8px;font-size:17px}
 .duty .sub3{font-weight:700;font-size:14px;color:var(--sub);margin:14px 0 2px}
 .lv{margin-top:6px}.lv .two{margin-top:14px}
 .duty .row .x{padding:6px 10px;font-size:13px}
+.calhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.calhd h3{margin:0;font-size:19px;text-align:center;flex:1}
+.calhd button{width:40px;height:36px;padding:0;font-size:22px;line-height:1}
+.calhd button:disabled{opacity:.3}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;font-size:13px;color:var(--sub);margin-bottom:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .h{text-align:center;font-size:13px;font-weight:700;color:var(--sub);padding:2px 0}
+.cal .h.sun{color:#d33}
+.cal .c{position:relative;text-align:center;font-weight:700;font-size:15px;padding:7px 0;border-radius:7px;color:#fff}
+.cal .c.w0{color:#9aa3ad;background:#f2f4f5}
+.cal .c.sun{color:#d33;background:transparent}
+.cal .c.w1{background:#c62828}.cal .c.w2{background:#e58a1f}.cal .c.w3{background:#e6b422;color:#3b2f00}.cal .c.w4{background:#5f9f5f}
+.cal .c.hol::after{content:"";position:absolute;top:3px;right:4px;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #d33}
+.cal .c.today{outline:3px solid var(--ink);outline-offset:1px}
+.calnotes{margin-top:10px;font-size:14px;line-height:1.55}
+.calnotes div{padding:3px 0}
+.calnotes .off{color:#c62828;font-weight:700}
 .man img{display:block;width:100%;height:auto;border-radius:12px;margin-bottom:12px;background:#fff}
 </style>
 
@@ -143,7 +161,7 @@ h3{margin:0 0 8px;font-size:17px}
       </section>
       <section class="screen side duty" data-tab="info">
         <div class="card"><h3>공지</h3><div class="list" id="notices"></div></div>
-        <div class="card" style="margin-top:12px"><h3 id="schTitle">학사일정</h3><div class="list" id="sched"></div></div>
+        <div class="card" style="margin-top:12px"><div class="calhd"><button id="calPrev" aria-label="이전 달">‹</button><h3 id="schTitle">학사일정</h3><button id="calNext" aria-label="다음 달">›</button></div><div id="cal"></div><div class="list" id="sched"></div></div>
         <div class="card" style="margin-top:12px"><h3>이번 주 내 근무<small id="wkRange"></small></h3><div id="myWeek"></div>
           <div id="myLeavesWrap"><div class="sub3">내 휴무 신청</div><div id="myLeaves"></div></div>
           <button class="go lvOpen" id="lvOpen">휴무 신청</button>
@@ -253,7 +271,7 @@ async function submit(S,r,bt){
 // 매뉴얼: clinic/manual/ 폴더 그림 파일(킴쌤 제작). 순서대로 파일 이름만 적으면 됨
 const MANUAL=[];
 // 근무 탭 (조교근무 탭 ← API duty)
-let lvPick="";
+let lvPick="", calIdx=0;
 const chipOf=(st,sub)=>st==="대체 완료"?`<span class="chip sub">대체 완료 · ${esc(sub||"")}</span>`:st==="대체 미정"?`<span class="chip wait">휴무 · 대체 미정</span>`:`<span class="chip">근무</span>`;
 function renderDuty(){
   const g=D.duty;
@@ -297,10 +315,19 @@ async function cancelLeave(row,bt){
 function renderManual(){$("#manual").innerHTML=MANUAL.length?MANUAL.map((f,i)=>`<img src="manual/${f}" alt="매뉴얼 ${i+1}" loading="lazy">`).join(""):`<div class="card"><div class="empty">매뉴얼 준비 중입니다</div></div>`;}
 function renderInfo(){renderManual();renderDuty();
   const N=D.notices||[]; $("#notices").innerHTML=N.length?N.map(n=>`<div class="it"><span class="d">${esc(n.date)}</span><span class="t">${esc(n.text)}</span></div>`).join(""):`<div class="empty">공지가 없습니다</div>`;
-  const t=new Date(D.today+"T00:00:00"),M=t.getMonth()+1; $("#schTitle").textContent=M+"월 학사일정";
+  const t=new Date(D.today+"T00:00:00"); const C=D.cal||[]; if(calIdx>=C.length)calIdx=0;
+  const cm=C[calIdx]; const M=cm?cm.m:t.getMonth()+1; $("#schTitle").textContent=cm?cm.title+" 학사일정":M+"월 학사일정";
+  $("#calPrev").hidden=$("#calNext").hidden=!C.length; $("#calPrev").disabled=calIdx<=0; $("#calNext").disabled=calIdx>=C.length-1;
+  $("#calPrev").onclick=()=>{calIdx--;renderInfo()}; $("#calNext").onclick=()=>{calIdx++;renderInfo()};
+  if(cm){
+    const first=new Date(cm.y,cm.m-1,1).getDay(); const isToday=d=>cm.y===t.getFullYear()&&cm.m===t.getMonth()+1&&d===t.getDate();
+    let g=["일","월","화","수","목","금","토"].map((h,i)=>`<div class="h${i===0?" sun":""}">${h}</div>`).join("")+"<div></div>".repeat(first);
+    g+=cm.days.map(x=>{const dow=(first+x.d-1)%7;const cls=dow===0?"sun":"w"+x.wk;return`<div class="c ${cls}${x.red&&dow!==0?" hol":""}${isToday(x.d)?" today":""}">${x.d}</div>`}).join("");
+    $("#cal").innerHTML=`<div class="legend"><span><i style="background:#c62828"></i>1주</span><span><i style="background:#e58a1f"></i>2주</span><span><i style="background:#e6b422"></i>3주</span><span><i style="background:#5f9f5f"></i>4주</span><span><i style="background:#f2f4f5;border:1px solid #ccc"></i>수업 없음</span><span><i style="background:#fff;border-radius:50%;box-shadow:0 0 0 2px #d33;width:9px;height:9px"></i>공휴일</span></div><div class="cal">${g}</div>`+(cm.notes.length?`<div class="calnotes">${cm.notes.map(n=>`<div class="${/휴강|휴원|방학|휴무/.test(n)?"off":""}">※ ${esc(n)}</div>`).join("")}</div>`:"");
+  } else $("#cal").innerHTML="";
   const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?[+m[1],+m[2]]:null};
   const rows=(D.schedule||[]).map(x=>({x,d:md(x.date)})).filter(o=>o.d&&o.d[0]===M).sort((a,b)=>a.d[1]-b.d[1]);
-  $("#sched").innerHTML=rows.length?rows.map(({x})=>{const off=/휴|공휴|쉼|휴강|휴원/.test((x.kind||"")+(x.text||""));return`<div class="it${off?" off":""}"><span class="d">${esc(x.date)}</span><span class="t">${esc((x.kind?x.kind+" · ":"")+x.text)}</span></div>`}).join(""):`<div class="empty">이번 달 일정이 없습니다</div>`;
+  $("#sched").innerHTML=rows.length?rows.map(({x})=>{const off=/휴|공휴|쉼|휴강|휴원/.test((x.kind||"")+(x.text||""));return`<div class="it${off?" off":""}"><span class="d">${esc(x.date)}</span><span class="t">${esc((x.kind?x.kind+" · ":"")+x.text)}</span></div>`}).join(""):(cm?"":`<div class="empty">이번 달 일정이 없습니다</div>`);
 }
 
 function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;if(!sel.day)sel=defaultPick();render();go(innerWidth>=900?"mk":(ls.get("tab")||"mk"));}
