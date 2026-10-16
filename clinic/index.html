@@ -114,6 +114,16 @@ h3{margin:0 0 8px;font-size:17px}
 .lv input[type=date],.lv input[type=time]{-webkit-appearance:none;appearance:none;text-align:left;background:var(--panel);color:var(--ink)}
 .lv input::-webkit-date-and-time-value{text-align:left}
 .lv .two input{flex:1 1 0}
+.lv .datebtn{display:flex;align-items:center;justify-content:space-between;width:100%;height:48px;padding:0 14px;font-size:17px;font-weight:700;text-align:left}
+.lv .datebtn .ic{font-size:22px}
+.lv .pick{margin-top:8px;border:1px solid var(--line);border-radius:12px;padding:10px}
+.lv .pick .calhd h3{font-size:16px}
+.lv .pd{position:relative;padding:9px 0;border-radius:8px;font-size:15px;font-weight:700;border:0;background:var(--soft);color:var(--ink)}
+.lv .pd.sun{color:#d33}
+.lv .pd.off{opacity:.3;background:transparent}
+.lv .pd.mine::after{content:"";position:absolute;left:50%;bottom:3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--brand)}
+.lv .pd.on{background:var(--brand);color:#fff}.lv .pd.on::after{background:#fff}
+.lv .pkhint{margin-top:8px;font-size:13px;color:var(--sub)}.lv .pkhint i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-right:5px;vertical-align:1px}
 .lv label{display:block;font-weight:700;margin:12px 0 6px}
 .lv .opts{display:flex;flex-wrap:wrap;gap:6px}
 .lv .opts button{font-weight:600;padding:8px 12px}
@@ -185,7 +195,7 @@ h3{margin:0 0 8px;font-size:17px}
         <div class="card" style="margin-top:12px"><h3>내 근무</h3><div class="sub3" style="margin-top:4px">요일별 고정 근무</div><div id="myBase"></div><div class="sub3" id="monTitle" hidden>이번 달 근무 상세</div><div id="myWeek" hidden></div>
           <button class="go lvOpen" id="lvOpen">휴무 신청</button>
           <div class="lv" id="lvForm" hidden>
-            <label for="lvDate">날짜</label><input type="date" id="lvDate">
+            <label>날짜</label><input type="hidden" id="lvDate"><button type="button" class="datebtn" id="lvDateBtn"><span id="lvDateTxt"></span><span class="ic">📅</span></button><div class="pick" id="lvCal" hidden></div>
             <label>시간</label><div class="opts" id="lvOpts"></div>
             <div class="two" id="lvCustom" hidden><input type="time" id="lvFrom" step="1800"><input type="time" id="lvTo" step="1800"></div>
             <label for="lvWhy">사유 (선택)</label><input id="lvWhy" maxlength="100" placeholder="예: 학교 시험">
@@ -315,7 +325,7 @@ function renderDuty(){
   $("#myLeavesWrap").hidden=!L.length;
   $("#myLeaves").innerHTML=L.length?L.map(l=>`<div class="row"><span class="d">${esc(l.date)}</span><span class="tm">${l.from?esc(l.from)+"~"+esc(l.to||""):"하루 전체"}${l.room?`<small>${esc(l.room)}</small>`:""}</span>${chipOf(l.status,l.sub)}${l.sub?"":`<button class="x" data-cancel="${l.row}">취소</button>`}</div>`).join(""):`<div class="empty">신청한 휴무가 없습니다</div>`;
   $("#myLeaves").querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancelLeave(+b.dataset.cancel,b));
-  const di=$("#lvDate"); di.min=D.today; if(!di.value)di.value=D.today; renderLvOpts();
+  const di=$("#lvDate"); if(!di.value||di.value<D.today)di.value=D.today; showLvDate(); renderLvOpts();
 }
 function renderLvOpts(){
   const v=$("#lvDate").value; const dow=v?"일월화수목금토"[new Date(v+"T00:00:00").getDay()]:"";
@@ -326,7 +336,22 @@ function renderLvOpts(){
   $("#lvOpts").querySelectorAll("button").forEach(b=>b.onclick=()=>{lvPick=b.dataset.k;renderLvOpts()});
   $("#lvCustom").hidden=lvPick!=="custom";
 }
-$("#lvDate").onchange=()=>{lvPick="";renderLvOpts()};
+// 날짜 고르기: 📅 누르면 달력이 펼쳐짐(이번 달~2달 뒤). 내 근무 요일은 초록 점
+let pkM=null;
+function showLvDate(){const v=$("#lvDate").value;if(!v){$("#lvDateTxt").textContent="날짜 고르기";return}const d=new Date(v+"T00:00:00");$("#lvDateTxt").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+"일월화수목금토"[d.getDay()]+")";}
+function renderPick(){
+  const t=new Date(D.today+"T00:00:00"); if(!pkM)pkM=new Date(t.getFullYear(),t.getMonth(),1);
+  const y=pkM.getFullYear(),m=pkM.getMonth(),first=new Date(y,m,1).getDay(),last=new Date(y,m+1,0).getDate();
+  const minM=new Date(t.getFullYear(),t.getMonth(),1),maxM=new Date(t.getFullYear(),t.getMonth()+2,1);
+  const mine=new Set(((D.duty&&D.duty.base)||[]).map(b=>b.dow)), sel=$("#lvDate").value;
+  let g=`<div class="calhd"><button type="button" id="pkPrev" ${pkM<=minM?"disabled":""}>‹</button><h3>${y}년 ${m+1}월</h3><button type="button" id="pkNext" ${pkM>=maxM?"disabled":""}>›</button></div><div class="cal">`+["일","월","화","수","목","금","토"].map((h,i)=>`<div class="h${i===0?" sun":""}">${h}</div>`).join("")+"<div></div>".repeat(first);
+  for(let d=1;d<=last;d++){const ymd=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"),dw="일월화수목금토"[(first+d-1)%7],past=ymd<D.today;
+    g+=`<button type="button" class="pd${past?" off":""}${ymd===sel?" on":""}${mine.has(dw)?" mine":""}${dw==="일"?" sun":""}" data-ymd="${ymd}" ${past?"disabled":""}>${d}</button>`;}
+  $("#lvCal").innerHTML=g+`</div><div class="pkhint"><i></i>내 근무 요일</div>`;
+  $("#pkPrev").onclick=()=>{pkM=new Date(y,m-1,1);renderPick()};$("#pkNext").onclick=()=>{pkM=new Date(y,m+1,1);renderPick()};
+  $("#lvCal").querySelectorAll(".pd:not([disabled])").forEach(b=>b.onclick=()=>{$("#lvDate").value=b.dataset.ymd;$("#lvCal").hidden=true;showLvDate();lvPick="";renderLvOpts();});
+}
+$("#lvDateBtn").onclick=()=>{const c=$("#lvCal");c.hidden=!c.hidden;if(!c.hidden){const v=$("#lvDate").value;if(v){const d=new Date(v+"T00:00:00");pkM=new Date(d.getFullYear(),d.getMonth(),1)}renderPick()}};
 $("#lvOpen").onclick=()=>{$("#lvForm").hidden=false;$("#lvOpen").hidden=true;renderLvOpts()};
 $("#lvClose").onclick=()=>{$("#lvForm").hidden=true;$("#lvOpen").hidden=false};
 $("#lvGo").onclick=async()=>{
