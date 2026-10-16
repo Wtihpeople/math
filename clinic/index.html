@@ -69,6 +69,9 @@ h3{margin:0 0 8px;font-size:17px}
 .room .ft .sum{font-size:15px;color:var(--sub)}
 .room .ft button{margin-left:auto;padding:10px 22px;font-size:16px}
 .empty{color:var(--sub);text-align:center;padding:18px 0}
+.scope{display:flex;gap:6px;margin-top:8px}
+.scope button{flex:1 1 0;font-weight:600;font-size:15px;padding:8px 4px;border-radius:10px}
+.scope button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .warnbar{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:8px 12px;font-weight:600;margin-top:10px}
 /* 공지·일정 */
 .list .it{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px;white-space:pre-line}
@@ -115,6 +118,7 @@ h3{margin:0 0 8px;font-size:17px}
         <div class="pick" id="pick">
           <div class="seg2" id="dayPick"></div>
           <div class="seg2 slots" id="slotPick"></div>
+          <div class="scope" id="scopePick"></div>
         </div>
         <div id="rooms"></div>
       </section>
@@ -139,7 +143,10 @@ function toast(m,ms){const t=$("#toast");t.textContent=m;t.classList.add("show")
 function setTopH(){const t=$("#top");if(t&&!t.hidden)document.documentElement.style.setProperty("--toph",t.offsetHeight+"px")}
 addEventListener("resize",setTopH);
 
-let D=null, sel={day:"",slot:""}, picks={}; // picks[slot|mkRow] = "출석"|"결석"
+let D=null, sel={day:"",slot:""}, picks={};
+let scope=ls.get("scope")||"mine"; // 'mine' = 내 담당 교실만 (담당 칸에 내 이름), 'all' = 전체
+const isMine=r=>String(r.teacher||"").split(/[\s,·/]+/).includes(D.me.name);
+const roomsOf=S=>scope==="all"?S.rooms:S.rooms.filter(isMine); // picks[slot|mkRow] = "출석"|"결석"
 const TITLE={"금3":"3시","금6":"6시","토10":"10시","토2":"2시","토5":"5시"};
 const TIME={"금3":"3시~6시","금6":"6시~9시","토10":"10시~1시","토2":"2시~5시","토5":"5시~8시"};
 
@@ -159,9 +166,11 @@ function render(){
   $("#dayPick").innerHTML=days.map(([d,md])=>`<button data-d="${d}" aria-pressed="${sel.day===d}">${d}요일 ${md}</button>`).join("");
   const slots=b.slots.filter(s=>s.day===sel.day);
   if(!slots.some(s=>s.code===sel.slot))sel.slot=slots[0].code;
-  $("#slotPick").innerHTML=slots.map(s=>{const n=s.rooms.reduce((a,r)=>a+r.students.length,0);return`<button data-s="${s.code}" aria-pressed="${sel.slot===s.code}">${TITLE[s.code]}<small>${n}명</small></button>`}).join("");
+  $("#slotPick").innerHTML=slots.map(s=>{const n=roomsOf(s).reduce((a,r)=>a+r.students.length,0);return`<button data-s="${s.code}" aria-pressed="${sel.slot===s.code}">${TITLE[s.code]}<small>${n}명</small></button>`}).join("");
   document.querySelectorAll("#dayPick button").forEach(x=>x.onclick=()=>{sel.day=x.dataset.d;sel.slot="";render()});
   document.querySelectorAll("#slotPick button").forEach(x=>x.onclick=()=>{sel.slot=x.dataset.s;render()});
+  $("#scopePick").innerHTML=`<button data-sc="mine" aria-pressed="${scope==="mine"}">내 담당 교실</button><button data-sc="all" aria-pressed="${scope==="all"}">전체 교실</button>`;
+  document.querySelectorAll("#scopePick button").forEach(x=>x.onclick=()=>{scope=x.dataset.sc;ls.set("scope",scope);render()});
   renderRooms(); renderInfo(); setTopH();
 }
 const curOf=(slot,s)=>picks[slot+"|"+s.mkRow]||(s.att==="출"?"출석":s.att==="결"?"결석":"");
@@ -169,7 +178,9 @@ const otherOf=s=>s.att&&s.att!=="출"&&s.att!=="결"?s.att:""; // '토10'(이동
 function renderRooms(){
   const S=D.slots.find(s=>s.code===sel.slot); const host=$("#rooms");
   if(!S||!S.rooms.length){host.innerHTML=`<div class="empty">이 시간 마클 학생이 없습니다</div>`;return}
-  host.innerHTML=(S.hasCol?"":`<div class="warnbar">마클 시트 3행에 ${esc(S.md)} 날짜 칸이 없어 제출할 수 없습니다. 데스크에 알려 주세요.</div>`)+S.rooms.map((r,ri)=>{
+  const R=roomsOf(S);
+  if(!R.length){host.innerHTML=`<div class="empty">이 시간에 ${esc(D.me.name)} 선생님 담당 교실이 없습니다<br><button id="seeAll" style="margin-top:10px">전체 교실 보기</button></div>`;$("#seeAll").onclick=()=>{scope="all";ls.set("scope",scope);render()};return}
+  host.innerHTML=(S.hasCol?"":`<div class="warnbar">마클 시트 3행에 ${esc(S.md)} 날짜 칸이 없어 제출할 수 없습니다. 데스크에 알려 주세요.</div>`)+R.map((r,ri)=>{
     const vals=r.students.map(s=>otherOf(s)?"기타":curOf(S.code,s));
     const o=vals.filter(v=>v==="출석").length,x=vals.filter(v=>v==="결석").length,left=vals.filter(v=>!v).length;
     const saved=r.students.every(s=>s.att);
@@ -182,7 +193,7 @@ function renderRooms(){
           ${s.note?`<div class="memo">${esc(s.note)}</div>`:""}${s.req?`<div class="memo">${esc(s.req)}</div>`:""}</div>`}).join("")}
       <div class="ft"><span class="sum">출석 ${o} · 결석 ${x}${left?` · 안 누름 ${left}`:""}</span><button class="primary" data-sub="${ri}" ${S.hasCol?"":"disabled"}>제출</button></div></div>`}).join("");
   host.querySelectorAll(".ab button").forEach(bt=>bt.onclick=()=>{picks[bt.dataset.k]=bt.dataset.v;renderRooms()});
-  host.querySelectorAll("[data-sub]").forEach(bt=>bt.onclick=()=>submit(S,S.rooms[+bt.dataset.sub],bt));
+  host.querySelectorAll("[data-sub]").forEach(bt=>bt.onclick=()=>submit(S,R[+bt.dataset.sub],bt));
 }
 async function submit(S,r,bt){
   const live=r.students.filter(s=>!otherOf(s));
