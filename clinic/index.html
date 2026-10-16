@@ -178,8 +178,7 @@ h3{margin:0 0 8px;font-size:17px}
       <section class="screen side duty" data-tab="info">
         <div class="card"><h3>공지</h3><div class="list" id="notices"></div></div>
         <div class="card" style="margin-top:12px"><div class="calhd"><button id="calPrev" aria-label="이전 달">‹</button><h3 id="schTitle">학사일정</h3><button id="calNext" aria-label="다음 달">›</button></div><div id="cal"></div><div class="list" id="sched"></div></div>
-        <div class="card" style="margin-top:12px"><h3>내 근무</h3><div class="sub3" style="margin-top:4px">요일별 고정 근무</div><div id="myBase"></div><div class="sub3" id="monTitle">이번 달 근무 상세</div><div id="myWeek"></div>
-          <div id="myLeavesWrap"><div class="sub3">내 휴무 신청</div><div id="myLeaves"></div></div>
+        <div class="card" style="margin-top:12px"><h3>내 근무</h3><div class="sub3" style="margin-top:4px">요일별 고정 근무</div><div id="myBase"></div><div class="sub3" id="monTitle" hidden>이번 달 근무 상세</div><div id="myWeek" hidden></div>
           <button class="go lvOpen" id="lvOpen">휴무 신청</button>
           <div class="lv" id="lvForm" hidden>
             <label for="lvDate">날짜</label><input type="date" id="lvDate">
@@ -188,6 +187,7 @@ h3{margin:0 0 8px;font-size:17px}
             <label for="lvWhy">사유 (선택)</label><input id="lvWhy" maxlength="100" placeholder="예: 학교 시험">
             <div class="two"><button id="lvClose" style="flex:1">닫기</button><button class="primary" id="lvGo" style="flex:2;padding:12px;font-size:17px">신청하기</button></div>
           </div>
+          <div id="myLeavesWrap"><div class="sub3">내 휴무 신청</div><div id="myLeaves"></div></div>
         </div>
       </section>
       <section class="screen man" data-tab="man" hidden><div id="manual"></div></section>
@@ -297,7 +297,7 @@ function renderDuty(){
   const byDow=ORD.split("").map(d=>[d,B.filter(b=>b.dow===d).sort((a,b)=>pad(a.from)<pad(b.from)?-1:1)]).filter(x=>x[1].length);
   $("#myBase").innerHTML=byDow.length?byDow.map(([d,list])=>`<div class="row"><span class="d dw">${d}</span><span class="tm">${list.map(b=>esc(b.from)+"~"+esc(b.to)+(b.memo?` <small style="display:inline">${esc(b.memo)}</small>`:"")).join("<br>")}</span></div>`).join(""):`<div class="empty">등록된 기본 근무가 없습니다<br>데스크에 근무 요일·시간을 알려 주세요</div>`;
   // ② 이번 달 근무 상세 (기본 근무 × 이번 달 날짜, 휴무 신청 반영)
-  $("#monTitle").textContent=(Mo+1)+"월 근무 상세"; $("#monTitle").hidden=!B.length;
+  $("#monTitle").textContent=(Mo+1)+"월 근무 상세"; // 근무 상세는 숨김(킴쌤 10/17) — #myWeek hidden
   const Lall=g.leaves||[], rows=[], last=new Date(Y,Mo+1,0).getDate();
   for(let d=1;d<=last;d++){const dt=new Date(Y,Mo,d),dw=DOW[dt.getDay()],ymd=Y+"-"+String(Mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
     B.filter(b=>b.dow===dw).sort((a,b)=>pad(a.from)<pad(b.from)?-1:1).forEach(b=>{
