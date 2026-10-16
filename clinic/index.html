@@ -34,7 +34,7 @@ input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;backgrou
 .top .logo{height:34px;width:auto}
 .top .me{font-weight:700;font-size:15px;white-space:nowrap}
 .top .tday{font-size:14px;font-weight:800;background:#fff;color:var(--brand);border-radius:6px;padding:2px 9px;white-space:nowrap}
-.top #refresh{margin-left:auto;flex:none;width:36px;height:36px;padding:0;border-radius:50%;background:#fff;color:var(--brand-deep);border-color:#fff;font-weight:900;font-size:21px;line-height:1}
+.top #refresh{margin-left:auto;flex:none;width:36px;height:36px;padding:0;border-radius:50%;background:#fff;color:var(--brand-deep);border-color:#fff;display:flex;align-items:center;justify-content:center}
 .top #refresh:disabled{opacity:.8}
 .top #refresh.spin{animation:rf .8s linear infinite}@keyframes rf{to{transform:rotate(360deg)}}
 .top #logout{margin-left:6px;background:transparent;color:#fff;border-color:rgba(255,255,255,.6);padding:5px 12px;font-size:14px;white-space:nowrap}
@@ -165,7 +165,7 @@ h3{margin:0 0 8px;font-size:17px}
 <div class="top" id="top" hidden>
   <img class="logo" src="../teacher/logo.png" alt="라임라잇수학학원" onerror="this.hidden=true">
   <span class="me" id="meName"></span><span class="tday" id="tday"></span>
-  <button id="refresh" aria-label="새로고침" title="새로고침">⟳</button><button id="logout">로그아웃</button>
+  <button id="refresh" aria-label="새로고침" title="새로고침"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><button id="logout">로그아웃</button>
 </div>
 
 <div class="wrap">
