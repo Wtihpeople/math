@@ -79,7 +79,7 @@ h3{margin:0 0 8px;font-size:17px}
 .list .it .d{min-width:74px;font-weight:700;white-space:nowrap}
 .list .it.off .d,.list .it.off .t{color:var(--bad)}
 /* 하단 탭 */
-.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{border:0;border-radius:0;background:transparent;padding:12px 0;font-weight:700;font-size:16px;color:var(--sub)}
 .tabs button[aria-selected="true"]{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
 /* 로그인 */
@@ -92,6 +92,21 @@ h3{margin:0 0 8px;font-size:17px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 @media (min-width:900px){.tabs{display:none}.screen{display:block!important}.both{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.both .side{position:sticky;top:calc(var(--toph,54px) + 10px)}.both .man{grid-column:1/-1}}
+.duty .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:16px}
+.duty .row:first-child{border-top:0}
+.duty .row .d{min-width:84px;font-weight:700;white-space:nowrap}
+.duty .row .tm{flex:1;min-width:0}
+.duty .row .tm small{display:block;color:var(--sub);font-size:13px}
+.chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;background:var(--brand-soft);color:var(--brand-deep)}
+.chip.wait{background:#fde2dd;color:#b3261e}.chip.sub{background:#dbe9fb;color:#1a4fb4}
+.duty h3 small{font-weight:500;color:var(--sub);font-size:13px;margin-left:6px}
+.lv label{display:block;font-weight:700;margin:12px 0 6px}
+.lv .opts{display:flex;flex-wrap:wrap;gap:6px}
+.lv .opts button{font-weight:600;padding:8px 12px}
+.lv .opts button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.lv .two{display:flex;gap:8px;margin-top:8px}
+.lv .go{width:100%;margin-top:14px;padding:12px;font-size:17px}
+.duty .row .x{padding:6px 10px;font-size:13px}
 .man img{display:block;width:100%;height:auto;border-radius:12px;margin-bottom:12px;background:#fff}
 </style>
 
@@ -128,11 +143,22 @@ h3{margin:0 0 8px;font-size:17px}
         <div class="card" style="margin-top:12px"><h3 id="schTitle">학사일정</h3><div class="list" id="sched"></div></div>
       </section>
       <section class="screen man" data-tab="man" hidden><div id="manual"></div></section>
+      <section class="screen man duty" data-tab="duty" hidden>
+        <div class="card"><h3>이번 주 내 근무<small id="wkRange"></small></h3><div id="myWeek"></div></div>
+        <div class="card lv" style="margin-top:12px"><h3>휴무 신청</h3>
+          <label for="lvDate">날짜</label><input type="date" id="lvDate">
+          <label>시간</label><div class="opts" id="lvOpts"></div>
+          <div class="two" id="lvCustom" hidden><input type="time" id="lvFrom" step="1800"><input type="time" id="lvTo" step="1800"></div>
+          <label for="lvWhy">사유 (선택)</label><input id="lvWhy" maxlength="100" placeholder="예: 학교 시험">
+          <button class="primary go" id="lvGo">휴무 신청</button>
+        </div>
+        <div class="card" style="margin-top:12px"><h3>내 휴무 신청</h3><div id="myLeaves"></div></div>
+      </section>
     </div>
   </div>
 </div>
 </div>
-<nav class="tabs" id="tabs" hidden><button data-go="info">공지</button><button data-go="man">매뉴얼</button><button data-go="mk" aria-selected="true">출석</button></nav>
+<nav class="tabs" id="tabs" hidden><button data-go="info">공지</button><button data-go="man">매뉴얼</button><button data-go="duty">근무</button><button data-go="mk" aria-selected="true">출석</button></nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -223,8 +249,47 @@ async function submit(S,r,bt){
 }
 // 매뉴얼: clinic/manual/ 폴더 그림 파일(킴쌤 제작). 순서대로 파일 이름만 적으면 됨
 const MANUAL=[];
+// 근무 탭 (조교근무 탭 ← API duty)
+let lvPick="";
+const chipOf=(st,sub)=>st==="대체 완료"?`<span class="chip sub">대체 완료 · ${esc(sub||"")}</span>`:st==="대체 미정"?`<span class="chip wait">휴무 · 대체 미정</span>`:`<span class="chip">근무</span>`;
+function renderDuty(){
+  const g=D.duty;
+  if(!g){$("#myWeek").innerHTML=`<div class="empty">근무표를 불러오지 못했습니다</div>`;$("#myLeaves").innerHTML="";return}
+  const W=g.week||[];
+  $("#wkRange").textContent=W.length?`${W[0].date.split(" ")[0]} ~ ${W[W.length-1].date.split(" ")[0]}`:"";
+  $("#myWeek").innerHTML=W.length?W.map(w=>`<div class="row"><span class="d">${esc(w.date)}</span><span class="tm">${esc(w.from)}~${esc(w.to)}${w.memo?`<small>${esc(w.memo)}</small>`:""}</span>${chipOf(w.status,w.sub)}</div>`).join(""):`<div class="empty">등록된 기본 근무가 없습니다<br>데스크에 근무 요일·시간을 알려 주세요</div>`;
+  const L=g.leaves||[];
+  $("#myLeaves").innerHTML=L.length?L.map(l=>`<div class="row"><span class="d">${esc(l.date)}</span><span class="tm">${l.from?esc(l.from)+"~"+esc(l.to||""):"하루 전체"}${l.room?`<small>${esc(l.room)}</small>`:""}</span>${chipOf(l.status,l.sub)}${l.sub?"":`<button class="x" data-cancel="${l.row}">취소</button>`}</div>`).join(""):`<div class="empty">신청한 휴무가 없습니다</div>`;
+  $("#myLeaves").querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancelLeave(+b.dataset.cancel,b));
+  const di=$("#lvDate"); di.min=D.today; if(!di.value)di.value=D.today; renderLvOpts();
+}
+function renderLvOpts(){
+  const v=$("#lvDate").value; const dow=v?"일월화수목금토"[new Date(v+"T00:00:00").getDay()]:"";
+  const mine=((D.duty&&D.duty.base)||[]).filter(b=>b.dow===dow);
+  const opts=[["all","하루 전체"]].concat(mine.map(b=>[b.from+"|"+b.to,b.from+"~"+b.to])).concat([["custom","직접 입력"]]);
+  if(!opts.some(o=>o[0]===lvPick))lvPick=mine.length?opts[1][0]:"all";
+  $("#lvOpts").innerHTML=opts.map(([k,l])=>`<button data-k="${esc(k)}" aria-pressed="${lvPick===k}">${esc(l)}</button>`).join("")+(v&&!mine.length?`<div class="meta" style="width:100%;color:var(--sub);font-size:14px">이 날은 기본 근무가 없습니다</div>`:"");
+  $("#lvOpts").querySelectorAll("button").forEach(b=>b.onclick=()=>{lvPick=b.dataset.k;renderLvOpts()});
+  $("#lvCustom").hidden=lvPick!=="custom";
+}
+$("#lvDate").onchange=()=>{lvPick="";renderLvOpts()};
+$("#lvGo").onclick=async()=>{
+  const date=$("#lvDate").value; if(!date){toast("날짜를 골라 주세요");return}
+  let from="",to=""; if(lvPick==="custom"){from=$("#lvFrom").value;to=$("#lvTo").value;if(!from||!to||from>=to){toast("시작·끝 시간을 확인해 주세요");return}}else if(lvPick!=="all")[from,to]=lvPick.split("|");
+  const bt=$("#lvGo"); bt.disabled=true; bt.textContent="신청 중…";
+  try{const r=await post({a:"leave",t:ls.get("token")||"",date,from,to,reason:$("#lvWhy").value.trim()});
+    if(!r.ok)throw new Error(r.error||"fail");
+    D.duty=r.duty;ls.set("data",JSON.stringify(D));$("#lvWhy").value="";renderDuty();toast("휴무 신청했습니다"+(r.room?" · "+r.room:""),3500);}
+  catch(e){const m={auth:"다시 로그인해 주세요",dup:"이미 같은 시간에 신청했습니다",past:"지난 날짜는 신청할 수 없습니다",time:"시간을 확인해 주세요",full:"신청 칸이 가득 찼습니다. 데스크에 알려 주세요"}[e.message];if(e.message==="auth")logout(m);else toast(m||"신청하지 못했습니다. 연결을 확인해 주세요")}
+  finally{bt.disabled=false;bt.textContent="휴무 신청"}
+};
+async function cancelLeave(row,bt){
+  bt.disabled=true;
+  try{const r=await post({a:"leaveCancel",t:ls.get("token")||"",row});if(!r.ok)throw new Error(r.error||"fail");D.duty=r.duty;ls.set("data",JSON.stringify(D));renderDuty();toast("휴무 신청을 취소했습니다")}
+  catch(e){toast(e.message==="done"?"대체가 정해져서 앱에서 취소할 수 없습니다. 데스크에 알려 주세요":"취소하지 못했습니다");bt.disabled=false}
+}
 function renderManual(){$("#manual").innerHTML=MANUAL.length?MANUAL.map((f,i)=>`<img src="manual/${f}" alt="매뉴얼 ${i+1}" loading="lazy">`).join(""):`<div class="card"><div class="empty">매뉴얼 준비 중입니다</div></div>`;}
-function renderInfo(){renderManual();
+function renderInfo(){renderManual();renderDuty();
   const N=D.notices||[]; $("#notices").innerHTML=N.length?N.map(n=>`<div class="it"><span class="d">${esc(n.date)}</span><span class="t">${esc(n.text)}</span></div>`).join(""):`<div class="empty">공지가 없습니다</div>`;
   const t=new Date(D.today+"T00:00:00"),M=t.getMonth()+1; $("#schTitle").textContent=M+"월 학사일정";
   const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?[+m[1],+m[2]]:null};
