@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>라임라잇수학 선생님</title>
 <meta name="theme-color" content="#2eaf64">
@@ -573,13 +574,13 @@ async function load(fresh,quiet){
   const c=ls.get("boot"); let shown=false;
   if(c&&!boot){try{boot=JSON.parse(c);mergeLocalAtt();showApp();shown=true;if(!quiet)toast("불러오는 중…")}catch(e){}}
   try{const r=await call({a:"bootstrap",t:ls.get("token")||"",fresh:fresh?"1":"0",all:ls.get("all")==="1"?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");boot=r;mergeLocalAtt();lastLoad=Date.now();ls.set("boot",JSON.stringify(boot));showApp();if(shown&&!quiet)toast("최신으로 갱신했습니다");}
-  catch(e){if(e.message!=="auth"&&boot){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{if(e.message==="auth")ls.del("token");$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":"연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요";$("#lerr").hidden=!$("#lerr").textContent}}
+  catch(e){if(e.message!=="auth"&&e.message!=="role"&&boot){toast("연결이 안 돼 저장된 화면을 보여줍니다")}else{if(e.message==="auth"||e.message==="role"){ls.del("token");ls.del("boot");boot=null}$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=e.message==="auth"?"다시 로그인해 주세요":e.message==="role"?"조교 선생님은 조교 앱(…/math/clinic/)으로 들어가 주세요":"연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요";$("#lerr").hidden=!$("#lerr").textContent}}
 }
 $("#go").onclick=async()=>{
   const base=$("#api").value.trim()||API_DEFAULT,name=$("#nm").value.trim(),pin=$("#pin").value.trim();
   if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
   ls.set("api",base);$("#go").disabled=true;
-  try{const r=await call({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);demo=false;$("#go").textContent="불러오는 중…";await load();$("#go").textContent="들어가기";}
+  try{const r=await call({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":r.error==="role"?"조교 선생님은 조교 앱(…/math/clinic/)으로 들어가 주세요":"연결 실패");ls.set("token",r.token);demo=false;$("#go").textContent="불러오는 중…";await load();$("#go").textContent="들어가기";}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"주소에 연결하지 못했습니다":e.message;$("#lerr").hidden=false}
   finally{$("#go").disabled=false}
 };

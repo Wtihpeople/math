@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>라임라잇 마클</title>
 <meta name="theme-color" content="#2eaf64">
@@ -172,8 +173,8 @@ h3{margin:0 0 8px;font-size:17px}
   <div class="login card" id="login">
     <div style="text-align:center;margin-bottom:6px"><img src="../teacher/logo-dark.png" alt="라임라잇수학학원" style="height:64px"></div>
     <h2 style="text-align:center;font-size:22px;margin:4px 0 8px">마스터클리닉</h2>
-    <label for="nm">이름</label><input id="nm" placeholder="예) 오유민" autocomplete="username">
-    <label for="pin">PIN 4자리</label><input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <label for="nm">아이디 : 성함</label><input id="nm" placeholder="예) 김라임" autocomplete="username">
+    <label for="pin">비밀번호 : 핸드폰 번호 뒷자리 4개</label><input id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="예) 1234" autocomplete="current-password">
     <div class="err" id="lerr" hidden></div>
     <button class="primary" id="go" style="width:100%;margin-top:14px;padding:12px">들어가기</button>
     <div class="howto"><b>폰 홈 화면에 앱처럼 넣기</b><div><span class="os">아이폰</span>사파리 아래 <b>공유</b> → <b>홈 화면에 추가</b></div><div><span class="os">안드로이드</span>크롬 오른쪽 위 <b>⋮</b> → <b>홈 화면에 추가</b></div></div>
@@ -404,13 +405,13 @@ function useData(r){D=keepExtras(r);ls.set("data",JSON.stringify(D));showApp();l
 async function load(fresh){
   const c=ls.get("data"); if(c&&!D){try{D=JSON.parse(c);showApp()}catch(e){}}
   try{const r=await post({a:"clinic",t:ls.get("token")||"",fresh:fresh?"1":"0",lite:"1"});if(!r.ok)throw new Error(r.error||"fail");useData(r);}
-  catch(e){if(e.message==="auth")logout("다시 로그인해 주세요");else if(D)toast("연결이 안 돼 저장된 화면을 보여줍니다");else logout("연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요")}
+  catch(e){if(e.message==="auth")logout("다시 로그인해 주세요");else if(e.message==="role")logout("조교 선생님 전용 앱입니다. 선생님은 선생님 앱으로 들어가 주세요");else if(D)toast("연결이 안 돼 저장된 화면을 보여줍니다");else logout("연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요")}
 }
 $("#go").onclick=async()=>{
   const name=$("#nm").value.trim(),pin=$("#pin").value.trim();
-  if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
+  if(!name||!pin){$("#lerr").textContent="성함과 핸드폰 뒷자리 4개를 적어 주세요";$("#lerr").hidden=false;return}
   $("#go").disabled=true;$("#go").textContent="확인 중…";
-  try{const r=await post({a:"login",name,pin,with:"clinic"});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);if(r.clinic&&r.clinic.ok)useData(r.clinic);else await load(true);}
+  try{const r=await post({a:"login",name,pin,with:"clinic"});if(!r.ok)throw new Error(r.error==="login"?"성함 또는 핸드폰 뒷자리가 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":r.error==="role"?"조교 선생님 전용 앱입니다. 선생님은 선생님 앱으로 들어가 주세요":"연결 실패");ls.set("token",r.token);if(r.clinic&&r.clinic.ok)useData(r.clinic);else await load(true);}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"연결하지 못했습니다":e.message;$("#lerr").hidden=false}
   finally{$("#go").disabled=false;$("#go").textContent="들어가기"}
 };
