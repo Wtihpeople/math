@@ -285,16 +285,17 @@ function renderRooms(){
 }
 async function submit(S,r,bt){
   const live=r.students.filter(s=>!otherOf(s));
+  // 킴쌤 10/17: 오는 순서대로 누르고 그때그때 제출 — 안 누른 학생은 비워 둔 채 저장, 나중에 다시 눌러 제출하면 고쳐짐
   const left=live.filter(s=>!curOf(S.code,s));
-  if(left.length){toast("출석·결석을 아직 안 누른 학생: "+left.slice(0,3).map(s=>s.name).join(", ")+(left.length>3?" 외 "+(left.length-3)+"명":""));return}
-  const items=live.map(s=>({name:s.name,status:curOf(S.code,s),note:"",makeup:!!s.makeup,mkRow:s.mkRow}));
+  const items=live.filter(s=>curOf(S.code,s)).map(s=>({name:s.name,status:curOf(S.code,s),note:"",makeup:!!s.makeup,mkRow:s.mkRow}));
+  if(!items.length){toast("출석 또는 결석을 먼저 눌러 주세요");return}
   bt.disabled=true;bt.textContent="저장 중…";
   try{
     const res=await post({a:"attendance",t:ls.get("token")||"",date:S.ymd,cls:"마클 "+S.code+" "+r.fl+" "+r.rm,items,weekly:null,mk:{code:S.code},clinicOnly:true});
     if(!res.ok)throw new Error(res.error||"fail");
     items.forEach(i=>{const s=r.students.find(x=>x.mkRow===i.mkRow);if(s)s.att=i.status==="결석"?"결":"출";delete picks[S.code+"|"+i.mkRow]});
     const kept=res.mk&&res.mk.kept&&res.mk.kept.length?" · 그대로 둔 칸 "+res.mk.kept.length:"";
-    toast(`${r.fl} ${r.rm} 제출했습니다 · 출석 ${items.filter(i=>i.status==="출석").length} · 결석 ${items.filter(i=>i.status==="결석").length}${kept}`);
+    toast(`${r.fl} ${r.rm} 저장했습니다 · 출석 ${items.filter(i=>i.status==="출석").length} · 결석 ${items.filter(i=>i.status==="결석").length}${left.length?` · 아직 ${left.length}명`:""}${kept}`);
     renderRooms();
   }catch(e){if(e.message==="auth"){logout("다시 로그인해 주세요")}else toast("저장하지 못했습니다. 연결을 확인하고 다시 눌러 주세요");bt.disabled=false;bt.textContent="제출"}
 }
