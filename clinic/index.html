@@ -56,7 +56,7 @@ h3{margin:0 0 8px;font-size:17px}
 .st:first-of-type{border-top:0}
 .st .nm b{font-size:17px}
 .st .nm .mk{display:inline-block;margin-left:6px;font-size:13px;font-weight:700;background:var(--info-soft);color:var(--info);border-radius:6px;padding:0 7px;vertical-align:2px}
-.st .meta{font-size:15px;color:var(--sub)}
+.st .meta{font-size:15px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st .meta b{color:var(--ink);font-weight:600}
 .st .memo{grid-column:1/-1;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:6px 10px;font-size:15px}
 .st .memo + .memo{margin-top:-2px}
@@ -173,6 +173,13 @@ function render(){
   document.querySelectorAll("#scopePick button").forEach(x=>x.onclick=()=>{scope=x.dataset.sc;ls.set("scope",scope);render()});
   renderRooms(); renderInfo(); setTopH();
 }
+// 진단 범위 줄이기: "[2.5단계]초등5-2 1~5단원 (…)" → "2.5단계 초5-2 1~5단원"
+function shortRange(v){v=String(v||"").trim();if(!v)return"";
+  const st=(v.match(/(\d+(?:\.\d+)?)\s*단계/)||[])[1];
+  const g=v.match(/(초등|중등|고등|초|중|고)\s*(\d)\s*[-–]\s*(\d)/);
+  const u=(v.match(/(\d+(?:\s*[~\-–]\s*\d+)?)\s*단원/)||[])[1];
+  const out=[st?st+"단계":"",g?g[1][0]+g[2]+"-"+g[3]:"",u?u.replace(/\s+/g,"")+"단원":""].filter(Boolean).join(" ");
+  return out||v.split(/[\n(]/)[0].trim().slice(0,20);}
 const curOf=(slot,s)=>picks[slot+"|"+s.mkRow]||(s.att==="출"?"출석":s.att==="결"?"결석":"");
 const otherOf=s=>s.att&&s.att!=="출"&&s.att!=="결"?s.att:""; // '토10'(이동)·'보강완료' 같은 사람 표기 → 앱에서 덮어쓰지 않음
 function renderRooms(){
@@ -188,7 +195,7 @@ function renderRooms(){
       <div class="hd"><b>${esc(r.fl)} ${esc(r.rm)}</b><span>${esc(r.teacher||"")}${r.teacher?" 선생님":""}</span><span class="cnt">${r.students.length}명</span></div>
       ${r.students.map(s=>{const cur=curOf(S.code,s),oth=otherOf(s);
         return `<div class="st"><div class="nm"><b>${esc(s.name)}</b>${s.makeup?`<span class="mk">보강</span>`:""}
-          <div class="meta">${esc(s.cls||"")}${s.range?` · 진단 <b>${esc(s.range)}</b>`:""}</div></div>
+          <div class="meta">${esc(s.cls||"")}${shortRange(s.range)?` · <b>${esc(shortRange(s.range))}</b>`:""}</div></div>
           <div class="ab">${oth?`<span class="other">${esc(oth)}</span>`:`<button class="o" data-k="${S.code}|${s.mkRow}" data-v="출석" aria-pressed="${cur==="출석"}">출석</button><button class="x" data-k="${S.code}|${s.mkRow}" data-v="결석" aria-pressed="${cur==="결석"}">결석</button>`}</div>
           ${s.note?`<div class="memo">${esc(s.note)}</div>`:""}${s.req?`<div class="memo">${esc(s.req)}</div>`:""}</div>`}).join("")}
       <div class="ft"><span class="sum">출석 ${o} · 결석 ${x}${left?` · 안 누름 ${left}`:""}</span><button class="primary" data-sub="${ri}" ${S.hasCol?"":"disabled"}>제출</button></div></div>`}).join("");
