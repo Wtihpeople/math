@@ -34,7 +34,10 @@ input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;backgrou
 .top .logo{height:34px;width:auto}
 .top .me{font-weight:700;font-size:15px;white-space:nowrap}
 .top .tday{font-size:14px;font-weight:800;background:#fff;color:var(--brand);border-radius:6px;padding:2px 9px;white-space:nowrap}
-.top #logout{margin-left:auto;background:transparent;color:#fff;border-color:rgba(255,255,255,.6);padding:5px 12px;font-size:14px;white-space:nowrap}
+.top #refresh{margin-left:auto;flex:none;width:36px;height:36px;padding:0;border-radius:50%;background:#fff;color:var(--brand-deep);border-color:#fff;font-weight:900;font-size:21px;line-height:1}
+.top #refresh:disabled{opacity:.8}
+.top #refresh.spin{animation:rf .8s linear infinite}@keyframes rf{to{transform:rotate(360deg)}}
+.top #logout{margin-left:6px;background:transparent;color:#fff;border-color:rgba(255,255,255,.6);padding:5px 12px;font-size:14px;white-space:nowrap}
 .wrap{max-width:820px;margin:0 auto;padding:12px 16px 24px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
 h3{margin:0 0 8px;font-size:17px}
@@ -144,7 +147,7 @@ h3{margin:0 0 8px;font-size:17px}
 <div class="top" id="top" hidden>
   <img class="logo" src="../teacher/logo.png" alt="라임라잇수학학원" onerror="this.hidden=true">
   <span class="me" id="meName"></span><span class="tday" id="tday"></span>
-  <button id="logout">로그아웃</button>
+  <button id="refresh" aria-label="새로고침" title="새로고침">⟳</button><button id="logout">로그아웃</button>
 </div>
 
 <div class="wrap">
@@ -341,6 +344,11 @@ function renderInfo(){renderManual();renderDuty();
 function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;if(!sel.day)sel=defaultPick();render();go(innerWidth>=900?"mk":(ls.get("tab")||"mk"));}
 function logout(msg){ls.del("token");ls.del("data");D=null;picks={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=msg||"";$("#lerr").hidden=!msg;}
 $("#logout").onclick=()=>logout("");
+// 새로고침: 앱 새 버전(화면)과 시트 최신 내용을 한 번에 받아 다시 연다
+$("#refresh").onclick=async()=>{const b=$("#refresh");b.disabled=true;b.classList.add("spin");
+  try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration();if(r)await r.update();}}catch(e){}
+  try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith("ll-clinic")).map(k=>caches.delete(k)));}catch(e){}
+  location.reload();};
 // 속도: 마클 화면(가벼운 것)을 먼저 그리고, 달력·근무표는 뒤이어 따로 받아 채운다
 function keepExtras(r){if(D){if(r.cal===undefined)r.cal=D.cal;if(r.duty===undefined)r.duty=D.duty}return r}
 async function loadExtras(){
