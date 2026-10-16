@@ -89,7 +89,7 @@ h3{margin:0 0 8px;font-size:17px}
 .list .it .d{min-width:74px;font-weight:700;white-space:nowrap}
 .list .it.off .d,.list .it.off .t{color:var(--bad)}
 /* 하단 탭 */
-.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{border:0;border-radius:0;background:transparent;padding:12px 0;font-weight:700;font-size:16px;color:var(--sub)}
 .tabs button[aria-selected="true"]{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
 /* 로그인 */
@@ -209,7 +209,7 @@ h3{margin:0 0 8px;font-size:17px}
   </div>
 </div>
 </div>
-<nav class="tabs" id="tabs" hidden><button data-go="info">공지</button><button data-go="man">매뉴얼</button><button data-go="mk" aria-selected="true">출석</button></nav>
+<nav class="tabs" id="tabs" hidden><button data-go="info">공지</button><!-- 매뉴얼 탭: 그림 작업 끝나면 다시 켬 (킴쌤 10/17) <button data-go="man">매뉴얼</button> --><button data-go="mk" aria-selected="true">출석</button></nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
