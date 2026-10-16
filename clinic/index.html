@@ -280,7 +280,7 @@ let lvPick="", calIdx=0;
 const chipOf=(st,sub)=>st==="대체 완료"?`<span class="chip sub">대체 완료 · ${esc(sub||"")}</span>`:st==="대체 미정"?`<span class="chip wait">휴무 · 대체 미정</span>`:`<span class="chip">근무</span>`;
 function renderDuty(){
   const g=D.duty;
-  if(!g){$("#myWeek").innerHTML=`<div class="empty">근무표를 불러오지 못했습니다</div>`;$("#myLeavesWrap").hidden=true;return}
+  if(!g){$("#myWeek").innerHTML=`<div class="empty">${g===undefined?"근무표 불러오는 중…":"근무표를 불러오지 못했습니다"}</div>`;$("#myLeavesWrap").hidden=true;return}
   const W=g.week||[];
   $("#wkRange").textContent=W.length?`${W[0].date.split(" ")[0]} ~ ${W[W.length-1].date.split(" ")[0]}`:"";
   $("#myWeek").innerHTML=W.length?W.map(w=>`<div class="row"><span class="d">${esc(w.date)}</span><span class="tm">${esc(w.from)}~${esc(w.to)}${w.memo?`<small>${esc(w.memo)}</small>`:""}</span>${chipOf(w.status,w.sub)}</div>`).join(""):`<div class="empty">등록된 기본 근무가 없습니다<br>데스크에 근무 요일·시간을 알려 주세요</div>`;
@@ -332,22 +332,28 @@ function renderInfo(){renderManual();renderDuty();
   } else $("#cal").innerHTML="";
   const md=s=>{const m=String(s||"").match(/(\d{1,2})\/(\d{1,2})/);return m?[+m[1],+m[2]]:null};
   const rows=(D.schedule||[]).map(x=>({x,d:md(x.date)})).filter(o=>o.d&&o.d[0]===M).sort((a,b)=>a.d[1]-b.d[1]);
-  $("#sched").innerHTML=rows.length?rows.map(({x})=>{const off=/휴|공휴|쉼|휴강|휴원/.test((x.kind||"")+(x.text||""));return`<div class="it${off?" off":""}"><span class="d">${esc(x.date)}</span><span class="t">${esc((x.kind?x.kind+" · ":"")+x.text)}</span></div>`}).join(""):(cm?"":`<div class="empty">이번 달 일정이 없습니다</div>`);
+  $("#sched").innerHTML=cm?"":(rows.length?rows.map(({x})=>`<div class="it"><span class="d">${esc(x.date)}</span><span class="t">${esc((x.kind?x.kind+" · ":"")+x.text)}</span></div>`).join(""):`<div class="empty">이번 달 일정이 없습니다</div>`); // 달력이 있으면 교무실 학사일정 목록은 안 보임(킴쌤 10/17)
 }
 
 function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#top").hidden=false;$("#tabs").hidden=false;if(!sel.day)sel=defaultPick();render();go(innerWidth>=900?"mk":(ls.get("tab")||"mk"));}
 function logout(msg){ls.del("token");ls.del("data");D=null;picks={};$("#app").hidden=true;$("#top").hidden=true;$("#tabs").hidden=true;$("#login").hidden=false;$("#lerr").textContent=msg||"";$("#lerr").hidden=!msg;}
 $("#logout").onclick=()=>logout("");
+// 속도: 마클 화면(가벼운 것)을 먼저 그리고, 달력·근무표는 뒤이어 따로 받아 채운다
+function keepExtras(r){if(D){if(r.cal===undefined)r.cal=D.cal;if(r.duty===undefined)r.duty=D.duty}return r}
+async function loadExtras(){
+  try{const x=await post({a:"extras",t:ls.get("token")||""});if(!x.ok||!D)return;D.cal=x.cal;D.duty=x.duty;ls.set("data",JSON.stringify(D));renderInfo();}catch(e){}
+}
+function useData(r){D=keepExtras(r);ls.set("data",JSON.stringify(D));showApp();loadExtras();}
 async function load(fresh){
   const c=ls.get("data"); if(c&&!D){try{D=JSON.parse(c);showApp()}catch(e){}}
-  try{const r=await post({a:"clinic",t:ls.get("token")||"",fresh:fresh?"1":"0"});if(!r.ok)throw new Error(r.error||"fail");D=r;ls.set("data",JSON.stringify(r));showApp();}
+  try{const r=await post({a:"clinic",t:ls.get("token")||"",fresh:fresh?"1":"0",lite:"1"});if(!r.ok)throw new Error(r.error||"fail");useData(r);}
   catch(e){if(e.message==="auth")logout("다시 로그인해 주세요");else if(D)toast("연결이 안 돼 저장된 화면을 보여줍니다");else logout("연결하지 못했습니다. 잠시 뒤 다시 들어가 주세요")}
 }
 $("#go").onclick=async()=>{
   const name=$("#nm").value.trim(),pin=$("#pin").value.trim();
   if(!name||!pin){$("#lerr").textContent="이름과 PIN을 적어 주세요";$("#lerr").hidden=false;return}
   $("#go").disabled=true;$("#go").textContent="확인 중…";
-  try{const r=await post({a:"login",name,pin});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);await load(true);}
+  try{const r=await post({a:"login",name,pin,with:"clinic"});if(!r.ok)throw new Error(r.error==="login"?"이름 또는 PIN이 맞지 않습니다":r.error==="locked"?"여러 번 틀려서 15분 동안 잠겼습니다":"연결 실패");ls.set("token",r.token);if(r.clinic&&r.clinic.ok)useData(r.clinic);else await load(true);}
   catch(e){$("#lerr").textContent=e.message.includes("fetch")?"연결하지 못했습니다":e.message;$("#lerr").hidden=false}
   finally{$("#go").disabled=false;$("#go").textContent="들어가기"}
 };
